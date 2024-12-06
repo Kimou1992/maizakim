@@ -16,11 +16,19 @@
             cursor: pointer;
         }
     </style>
+    <!-- إضافة Telegram Login Widget Script -->
+    <script async src="https://telegram.org/js/telegram-widget.js?7"
+        data-telegram-login="your_bot_username" 
+        data-size="large" 
+        data-radius="10" 
+        data-auth-url="https://your-server.com/auth"></script>
 </head>
 <body>
     <h1>Welcome to My Page</h1>
     <p>This is the first page. You can navigate to the second page using the button below.</p>
-    <!-- رابط الانتقال إلى page2.html مع المسار الصحيح -->
     <button onclick="window.location.href='https://kimou1992.github.io/maizakim/page2'">Go to Page 2</button>
+    <br><br>
+    <!-- إضافة الزر الخاص بتسجيل الدخول عبر Telegram -->
+    <div id="telegram-login"></div>
 </body>
 </html>

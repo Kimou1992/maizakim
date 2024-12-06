@@ -3,36 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page 2</title>
+    <title>Page 2 - User Info</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #0078d7;
-            color: white;
-            padding: 20px;
-        }
-        .container {
-            margin: 20px auto;
-            max-width: 500px;
-            padding: 20px;
-            background: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            margin-top: 50px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to Page 2</h1>
-    </header>
-    <div class="container">
-        <p>This is the second page. You came here by clicking the button on the first page.</p>
-    </div>
+    <h1>Welcome to Page 2</h1>
+    <p id="user-info">You are not logged in yet.</p>
+    <button onclick="window.location.href='https://kimou1992.github.io/maizakim/index'">Back to Home</button>
+
+    <script>
+        // سيتم هنا استخدام Telegram API لعرض بيانات المستخدم بعد التوثيق
+        // يتم إضافة بيانات المستخدم على الصفحة بعد نجاح تسجيل الدخول
+        window.onload = function() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                const user = window.Telegram.WebApp.initDataUnsafe;
+                if (user) {
+                    document.getElementById('user-info').innerHTML = `
+                        <strong>Welcome, ${user.first_name}!</strong><br>
+                        <strong>User ID:</strong> ${user.id}<br>
+                        <strong>Username:</strong> ${user.username}<br>
+                    `;
+                }
+            }
+        }
+    </script>
 </body>
 </html>

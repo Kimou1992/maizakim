@@ -3,49 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome My Site</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        #user-info {
-            margin-top: 20px;
-            font-size: 16px;
-            color: green;
-        }
-    </style>
-    <!-- إضافة Telegram Login Widget Script -->
-    <script async src="https://telegram.org/js/telegram-widget.js?22"
-        data-telegram-login="Tonhakimbot" <!-- تأكد من اسم البوت هنا -->
-        data-size="large" 
-        data-onauth="onTelegramAuth(user)" 
-        data-request-access="write"></script>
+    <title>My Telegram Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <h1>Welcome to My Page</h1>
-    <p>This is the first page. You can navigate to the second page using the button below.</p>
-    <button onclick="window.location.href='https://kimou1992.github.io/maizakim/page2'">Go to Page 2</button>
-    <br><br>
-    <!-- إضافة زر تسجيل الدخول عبر Telegram -->
-    <div id="telegram-login"></div>
-    <!-- قسم لعرض بيانات المستخدم بعد تسجيل الدخول -->
-    <div id="user-info">Please log in to see your Telegram data.</div>
+    <h1>Welcome to My Mini App</h1>
+    <p id="user-info">Loading...</p>
 
-    <script type="text/javascript">
-        // وظيفة onTelegramAuth التي تعرض بيانات المستخدم بعد تسجيل الدخول
-        function onTelegramAuth(user) {
-            document.getElementById('user-info').innerHTML = `
-                <strong>Welcome, ${user.first_name} ${user.last_name ? user.last_name : ''}!</strong><br>
-                <strong>User ID:</strong> ${user.id}<br>
-                <strong>Username:</strong> ${user.username ? '@' + user.username : 'Not provided'}<br>
-            `;
+    <script>
+        Telegram.WebApp.ready();
+
+        // قراءة بيانات المستخدم
+        const user = Telegram.WebApp.initDataUnsafe.user;
+
+        if (user) {
+            const userInfo = `User ID: ${user.id}, Name: ${user.first_name}, Username: ${user.username}`;
+            document.getElementById('user-info').innerText = userInfo;
+
+            // إرسال البيانات إلى الخادم لتخزينها
+            fetch('https://your-backend-url.com/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: user.id,
+                    first_name: user.first_name,
+                    username: user.username
+                })
+            });
+        } else {
+            document.getElementById('user-info').innerText = "User data not available.";
         }
     </script>
 </body>

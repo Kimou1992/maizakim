@@ -46,25 +46,29 @@
 <body>
     <div class="container">
         <h2>Pay via TON Space</h2>
-        <p>Click the button below to make a payment using your TON Space wallet in Telegram.</p>
+        <p>Click the button below to open your TON Space wallet in Telegram Mini App.</p>
         <button id="pay-button">Pay Now</button>
         <p>*Make sure you have TON Space enabled in your Telegram Wallet.</p>
     </div>
 
     <script>
-        document.getElementById("pay-button").addEventListener("click", function () {
-            // إعداد عنوان محفظتك والمبلغ
-            const recipientAddress = "UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl"; // استبدل بعنوان محفظتك TON Space
-            const amountTON = 0.1; // المبلغ المطلوب بـ TON (مثلاً 0.1 TON)
-            const memo = "Payment for Service"; // ملاحظة أو وصف الدفع (اختياري)
+        // تحقق من دعم Telegram Mini App API
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.ready();
+        }
 
-            // بناء الرابط وفق TON URI Scheme
+        document.getElementById("pay-button").addEventListener("click", function () {
+            // إعداد البيانات
+            const recipientAddress = "UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl"; // عنوانك
+            const amountTON = 0.1; // المبلغ المطلوب (مثلاً 0.1 TON)
+            const memo = "Payment via Mini App"; // ملاحظة اختيارية
+
+            // بناء رابط TON Space
             const tonPaymentLink = `ton://transfer/${recipientAddress}?amount=${amountTON}&text=${encodeURIComponent(memo)}`;
 
-            // فتح الرابط في نافذة جديدة أو إعادة توجيه المستخدم
-            window.location.href = tonPaymentLink;
+            // فتح الرابط في Telegram
+            Telegram.WebApp.openTelegramLink(tonPaymentLink);
         });
     </script>
 </body>
 </html>
-

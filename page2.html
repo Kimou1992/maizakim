@@ -3,72 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect TON Space Wallet</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f9;
-        }
-
-        .container {
-            text-align: center;
-            padding: 20px;
-            background: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #0088cc;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #005f8a;
-        }
-
-        p {
-            color: #555;
-            font-size: 14px;
-        }
-    </style>
+    <title>Check Telegram WebApp API</title>
 </head>
 <body>
-    <div class="container">
-        <h2>Connect Your TON Space Wallet</h2>
-        <p>Click the button below to connect your wallet automatically.</p>
-        <button id="connect-button">Connect Wallet</button>
-        <p id="wallet-address"></p>
-    </div>
+    <h1>Check Telegram WebApp API Status</h1>
+    <button id="checkApiButton">Check WebApp API</button>
+    <p id="statusMessage"></p>
 
     <script>
-        if (window.Telegram && Telegram.WebApp) {
-            // تعيين البيئة إلى جاهز للعمل
-            Telegram.WebApp.ready();
-
-            // الحصول على عنوان المحفظة مباشرة من Telegram WebApp API
-            const walletAddress = Telegram.WebApp.initDataUnsafe.user.id;
-
-            // عرض عنوان المحفظة تلقائيًا بعد الربط
-            document.getElementById("wallet-address").innerText = "Your Wallet Address: " + walletAddress;
-        }
-
-        document.getElementById("connect-button").addEventListener("click", function () {
-            if (window.Telegram && Telegram.WebApp) {
-                // فتح رابط الربط تلقائيًا إذا تم دعم WebApp API
-                Telegram.WebApp.openLink("ton://transfer?address=UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl&amount=0.1&text=Connect%20TON%20Space%20Wallet");
+        // التأكد من أن Telegram WebApp API موجودة
+        document.getElementById("checkApiButton").addEventListener("click", function () {
+            if (window.Telegram && window.Telegram.WebApp) {
+                // تهيئة WebApp إذا كانت API متوفرة
+                Telegram.WebApp.ready();
+                document.getElementById("statusMessage").innerText = "Telegram WebApp API is available!";
             } else {
-                alert("Telegram WebApp API is not available.");
+                document.getElementById("statusMessage").innerText = "Telegram WebApp API is not available!";
             }
         });
     </script>

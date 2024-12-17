@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check Telegram WebApp API</title>
+    <title>Telegram WebApp API Check</title>
 </head>
 <body>
     <h1>Check Telegram WebApp API Status</h1>
@@ -11,10 +11,8 @@
     <p id="statusMessage"></p>
 
     <script>
-        // التأكد من أن Telegram WebApp API موجودة
         document.getElementById("checkApiButton").addEventListener("click", function () {
             if (window.Telegram && window.Telegram.WebApp) {
-                // تهيئة WebApp إذا كانت API متوفرة
                 Telegram.WebApp.ready();
                 document.getElementById("statusMessage").innerText = "Telegram WebApp API is available!";
             } else {

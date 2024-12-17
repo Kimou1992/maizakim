@@ -46,20 +46,29 @@
 <body>
     <div class="container">
         <h2>Connect Your TON Space Wallet</h2>
-        <p>Click the button below to open TON Space wallet.</p>
+        <p>Click the button below to connect your wallet automatically.</p>
         <button id="connect-button">Connect Wallet</button>
+        <p id="wallet-address"></p>
     </div>
 
     <script>
-        document.getElementById("connect-button").addEventListener("click", function () {
-            // رابط ربط محفظة TON Space
-            const tonWalletLink = "ton://transfer?address=UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl&amount=0.1&text=Connect%20TON%20Space%20Wallet";
+        if (window.Telegram && Telegram.WebApp) {
+            // تعيين البيئة إلى جاهز للعمل
+            Telegram.WebApp.ready();
 
-            // فتح رابط المحفظة داخل Telegram
+            // الحصول على عنوان المحفظة مباشرة من Telegram WebApp API
+            const walletAddress = Telegram.WebApp.initDataUnsafe.user.id;
+
+            // عرض عنوان المحفظة تلقائيًا بعد الربط
+            document.getElementById("wallet-address").innerText = "Your Wallet Address: " + walletAddress;
+        }
+
+        document.getElementById("connect-button").addEventListener("click", function () {
             if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.openLink(tonWalletLink);
+                // فتح رابط الربط تلقائيًا إذا تم دعم WebApp API
+                Telegram.WebApp.openLink("ton://transfer?address=UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl&amount=0.1&text=Connect%20TON%20Space%20Wallet");
             } else {
-                window.open(tonWalletLink, "_blank"); // فتح الرابط في نافذة المتصفح كخيار احتياطي
+                alert("Telegram WebApp API is not available.");
             }
         });
     </script>

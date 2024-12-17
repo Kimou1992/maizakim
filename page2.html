@@ -3,35 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page 2 - User Info</title>
+    <title>TON Space Payment</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+
+        .container {
             text-align: center;
-            margin-top: 50px;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #0088cc;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005f8a;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to Page 2</h1>
-    <p id="user-info">You are not logged in yet.</p>
-    <button onclick="window.location.href='https://kimou1992.github.io/maizakim/index'">Back to Home</button>
+    <div class="container">
+        <h2>Pay with TON Space</h2>
+        <p>Click the button below to proceed with your payment.</p>
+        <button id="pay-button">Pay Now</button>
+    </div>
 
     <script>
-        // سيتم هنا استخدام Telegram API لعرض بيانات المستخدم بعد التوثيق
-        // يتم إضافة بيانات المستخدم على الصفحة بعد نجاح تسجيل الدخول
-        window.onload = function() {
-            if (window.Telegram && window.Telegram.WebApp) {
-                const user = window.Telegram.WebApp.initDataUnsafe;
-                if (user) {
-                    document.getElementById('user-info').innerHTML = `
-                        <strong>Welcome, ${user.first_name}!</strong><br>
-                        <strong>User ID:</strong> ${user.id}<br>
-                        <strong>Username:</strong> ${user.username}<br>
-                    `;
-                }
-            }
-        }
+        document.getElementById("pay-button").addEventListener("click", function() {
+            // إعداد عنوان الدفع ومبلغ المعاملة
+            const recipientAddress = "EQXXXXXXXXXXXXXXXXXXXXXXXXXXXX"; // ضع عنوان المحفظة المستقبلة
+            const amountTON = 0.1; // المبلغ المطلوب بالدفع بـ TON
+            const memo = "Payment for Service"; // ملاحظة اختيارية
+
+            // بناء رابط الدفع عبر TON
+            const tonPaymentLink = `https://tonhub.com/transfer/${recipientAddress}?amount=${amountTON}&text=${encodeURIComponent(memo)}`;
+
+            // فتح نافذة الدفع
+            window.open(tonPaymentLink, "_blank");
+        });
     </script>
 </body>
 </html>

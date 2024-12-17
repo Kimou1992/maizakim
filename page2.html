@@ -52,11 +52,11 @@
     </div>
 
     <script>
-        // تأكيد دعم Telegram WebApp API
+        // تحقق من دعم Telegram WebApp API
         if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.ready();
         } else {
-            alert("Telegram Mini App API is not available!");
+            document.getElementById('status').innerText = "Telegram Mini App API is not available!";
         }
 
         document.getElementById("pay-button").addEventListener("click", function () {

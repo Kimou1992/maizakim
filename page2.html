@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TON Space Payment</title>
+    <title>Connect TON Space Wallet</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,34 +45,21 @@
 </head>
 <body>
     <div class="container">
-        <h2>Pay via TON Space</h2>
-        <p>Click the button below to make a payment with TON Space wallet.</p>
-        <button id="pay-button">Pay Now</button>
-        <p>*Make sure you have TON Space enabled in Telegram Wallet.</p>
+        <h2>Connect Your TON Space Wallet</h2>
+        <p>Click the button below to open TON Space wallet.</p>
+        <button id="connect-button">Connect Wallet</button>
     </div>
 
     <script>
-        // تحقق من دعم Telegram WebApp API
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.ready();
-        } else {
-            document.getElementById('status').innerText = "Telegram Mini App API is not available!";
-        }
+        document.getElementById("connect-button").addEventListener("click", function () {
+            // رابط ربط محفظة TON Space
+            const tonWalletLink = "ton://transfer?address=UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl&amount=0.1&text=Connect%20TON%20Space%20Wallet";
 
-        document.getElementById("pay-button").addEventListener("click", function () {
-            // بيانات الدفع
-            const recipientAddress = "UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl"; // عنوان محفظتك
-            const amountTON = 0.1; // المبلغ المطلوب (بـ TON)
-            const memo = "Payment via TON Space"; // نص المذكرة (اختياري)
-
-            // بناء رابط التحويل
-            const tonPaymentLink = `https://wallet.ton.org/transfer?address=${recipientAddress}&amount=${amountTON}&text=${encodeURIComponent(memo)}`;
-
-            // فتح الرابط عبر Telegram WebApp
-            if (Telegram.WebApp) {
-                Telegram.WebApp.openLink(tonPaymentLink);
+            // فتح رابط المحفظة داخل Telegram
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.openLink(tonWalletLink);
             } else {
-                window.open(tonPaymentLink, "_blank"); // فتح في نافذة جديدة كخيار احتياطي
+                window.open(tonWalletLink, "_blank"); // فتح الرابط في نافذة المتصفح كخيار احتياطي
             }
         });
     </script>

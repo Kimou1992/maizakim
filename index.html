@@ -1,26 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram WebApp Check</title>
-</head>
-<body>
-    <h1>Testing Telegram WebApp API</h1>
-    <button id="checkApiButton">Check API Status</button>
-    <p id="statusMessage"></p>
-
+<html lang="ar">
+  <head>
+    <meta charset="utf-8">
+    <title>ربط محفظة TON</title>
+    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js" defer></script>
+  </head>
+  <body>
+    <h2>ربط محفظتك</h2>
+    <button id="connectButton">ربط المحفظة</button>
+    
     <script>
-        // التحقق من توافر Telegram WebApp API
-        document.getElementById("checkApiButton").addEventListener("click", function () {
-            if (window.Telegram && window.Telegram.WebApp) {
-                // إذا كانت API متاحة
-                Telegram.WebApp.ready();
-                document.getElementById("statusMessage").innerText = "Telegram WebApp API is available!";
-            } else {
-                document.getElementById("statusMessage").innerText = "Telegram WebApp API is not available!";
-            }
+      // التأكد من أن Telegram WebApp API متاح
+      if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+        const connector = new TonConnectSDK.TonConnect();
+
+        document.getElementById('connectButton').addEventListener('click', async () => {
+          try {
+            // محاولة الاتصال بالمحفظة عبر TonConnect
+            const wallet = await connector.connect();
+            alert(`تم ربط المحفظة بنجاح! العنوان: ${wallet.address}`);
+
+            // التفاعل مع Telegram WebApp API
+            Telegram.WebApp.expand();  // توسيع الواجهة لتناسب التطبيق
+          } catch (error) {
+            console.error("فشل ربط المحفظة:", error);
+            alert("حدث خطأ أثناء ربط المحفظة.");
+          }
         });
+      } else {
+        alert("Telegram WebApp API غير متاح.");
+      }
     </script>
-</body>
+  </body>
 </html>

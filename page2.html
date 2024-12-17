@@ -36,28 +36,35 @@
         button:hover {
             background-color: #005f8a;
         }
+
+        p {
+            color: #555;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Pay with TON Space</h2>
-        <p>Click the button below to proceed with your payment.</p>
+        <h2>Pay via TON Space</h2>
+        <p>Click the button below to make a payment using your TON Space wallet in Telegram.</p>
         <button id="pay-button">Pay Now</button>
+        <p>*Make sure you have TON Space enabled in your Telegram Wallet.</p>
     </div>
 
     <script>
-        document.getElementById("pay-button").addEventListener("click", function() {
-            // إعداد عنوان الدفع ومبلغ المعاملة
-            const recipientAddress = "EQXXXXXXXXXXXXXXXXXXXXXXXXXXXX"; // ضع عنوان المحفظة المستقبلة
-            const amountTON = 0.1; // المبلغ المطلوب بالدفع بـ TON
-            const memo = "Payment for Service"; // ملاحظة اختيارية
+        document.getElementById("pay-button").addEventListener("click", function () {
+            // إعداد عنوان محفظتك والمبلغ
+            const recipientAddress = "UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl"; // استبدل بعنوان محفظتك TON Space
+            const amountTON = 0.1; // المبلغ المطلوب بـ TON (مثلاً 0.1 TON)
+            const memo = "Payment for Service"; // ملاحظة أو وصف الدفع (اختياري)
 
-            // بناء رابط الدفع عبر TON
-            const tonPaymentLink = `https://tonhub.com/transfer/${recipientAddress}?amount=${amountTON}&text=${encodeURIComponent(memo)}`;
+            // بناء الرابط وفق TON URI Scheme
+            const tonPaymentLink = `ton://transfer/${recipientAddress}?amount=${amountTON}&text=${encodeURIComponent(memo)}`;
 
-            // فتح نافذة الدفع
-            window.open(tonPaymentLink, "_blank");
+            // فتح الرابط في نافذة جديدة أو إعادة توجيه المستخدم
+            window.location.href = tonPaymentLink;
         });
     </script>
 </body>
 </html>
+

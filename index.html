@@ -3,36 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Telegram Mini App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Check Telegram WebApp API</title>
 </head>
 <body>
-    <h1>Welcome to My Mini App</h1>
-    <p id="user-info">Loading...</p>
+    <h1>Check Telegram WebApp API Status</h1>
+    <button id="checkApiButton">Check WebApp API</button>
+    <p id="statusMessage"></p>
 
     <script>
-        Telegram.WebApp.ready();
-
-        // قراءة بيانات المستخدم
-        const user = Telegram.WebApp.initDataUnsafe.user;
-
-        if (user) {
-            const userInfo = `User ID: ${user.id}, Name: ${user.first_name}, Username: ${user.username}`;
-            document.getElementById('user-info').innerText = userInfo;
-
-            // إرسال البيانات إلى الخادم لتخزينها
-            fetch('https://your-backend-url.com/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: user.id,
-                    first_name: user.first_name,
-                    username: user.username
-                })
-            });
-        } else {
-            document.getElementById('user-info').innerText = "User data not available.";
-        }
+        // التأكد من أن Telegram WebApp API موجودة
+        document.getElementById("checkApiButton").addEventListener("click", function () {
+            if (window.Telegram && window.Telegram.WebApp) {
+                // تهيئة WebApp إذا كانت API متوفرة
+                Telegram.WebApp.ready();
+                document.getElementById("statusMessage").innerText = "Telegram WebApp API is available!";
+            } else {
+                document.getElementById("statusMessage").innerText = "Telegram WebApp API is not available!";
+            }
+        });
     </script>
 </body>
 </html>

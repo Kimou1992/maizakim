@@ -1,35 +1,96 @@
 <!DOCTYPE html>
 <html lang="ar">
-  <head>
-    <meta charset="utf-8">
-    <title>ربط محفظة TON</title>
-    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js" defer></script>
-  </head>
-  <body>
-    <h2>ربط محفظتك</h2>
-    <button id="connectButton">ربط المحفظة</button>
-    
-    <script>
-      // التأكد من أن Telegram WebApp API متاح
-      if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-        const connector = new TonConnectSDK.TonConnect();
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini App Interaction with Telegram Bot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      cursor: pointer;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
 
-        document.getElementById('connectButton').addEventListener('click', async () => {
-          try {
-            // محاولة الاتصال بالمحفظة عبر TonConnect
-            const wallet = await connector.connect();
-            alert(`تم ربط المحفظة بنجاح! العنوان: ${wallet.address}`);
+  <h1>تفاعل مع البوت من داخل Mini App</h1>
+  <p>اضغط على الأزرار لتأكيد المعاملة أو إلغائها</p>
 
-            // التفاعل مع Telegram WebApp API
-            Telegram.WebApp.expand();  // توسيع الواجهة لتناسب التطبيق
-          } catch (error) {
-            console.error("فشل ربط المحفظة:", error);
-            alert("حدث خطأ أثناء ربط المحفظة.");
+  <!-- زر Inline في الـ Mini App -->
+  <button id="confirmBtn">تأكيد المعاملة</button>
+  <button id="cancelBtn">إلغاء المعاملة</button>
+
+  <div id="message"></div>
+
+  <script>
+    const botToken = 'YOUR_BOT_API_TOKEN'; // استبدل بمفتاح API الخاص بالبوت
+    const chatId = 'USER_CHAT_ID'; // استبدل بـ chat_id الخاص بالمستخدم
+
+    // إرسال رسالة مع الأزرار
+    function sendInlineMessage() {
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: "هل أنت متأكد من إتمام المعاملة؟",
+          reply_markup: JSON.stringify({
+            inline_keyboard: [
+              [
+                { text: "تأكيد المعاملة", callback_data: "confirm_transaction" },
+                { text: "إلغاء المعاملة", callback_data: "cancel_transaction" }
+              ]
+            ]
+          })
+        })
+      })
+      .then(response => response.json())
+      .then(data => console.log("تم إرسال الرسالة بنجاح"))
+      .catch(error => console.error("خطأ في إرسال الرسالة:", error));
+    }
+
+    // استلام التحديثات عبر Polling
+    function getUpdates() {
+      fetch(`https://api.telegram.org/bot${botToken}/getUpdates`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.result.length > 0) {
+            const update = data.result[0];
+            const callbackData = update.callback_query ? update.callback_query.data : null;
+            if (callbackData === "confirm_transaction") {
+              document.getElementById('message').textContent = "تم تأكيد المعاملة بنجاح!";
+            } else if (callbackData === "cancel_transaction") {
+              document.getElementById('message').textContent = "تم إلغاء المعاملة.";
+            }
           }
-        });
-      } else {
-        alert("Telegram WebApp API غير متاح.");
-      }
-    </script>
-  </body>
+        })
+        .catch(error => console.error("خطأ في الحصول على التحديثات:", error));
+    }
+
+    // بدء التفاعل عندما يضغط المستخدم على الأزرار
+    document.getElementById('confirmBtn').addEventListener('click', function() {
+      sendInlineMessage();
+    });
+
+    document.getElementById('cancelBtn').addEventListener('click', function() {
+      sendInlineMessage();
+    });
+
+    // استعلام التحديثات كل 5 ثوانٍ
+    setInterval(getUpdates, 5000);
+  </script>
+
+</body>
 </html>

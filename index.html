@@ -39,7 +39,7 @@
     const chatId = '7119877516'; // chat_id الخاص بالمستخدم
 
     // إرسال رسالة مع الأزرار
-    function sendInlineMessage() {
+    function sendInlineMessage(action) {
       fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -61,6 +61,7 @@
         console.log("Response from Telegram:", data); // مراقبة الاستجابة من Telegram
         if (data.ok) {
           console.log("تم إرسال الرسالة بنجاح");
+          document.getElementById('message').textContent = action === 'confirm' ? "تم تأكيد المعاملة بنجاح!" : "تم إلغاء المعاملة.";
         } else {
           console.error("حدث خطأ أثناء إرسال الرسالة:", data.description);
         }
@@ -88,11 +89,11 @@
 
     // بدء التفاعل عندما يضغط المستخدم على الأزرار
     document.getElementById('confirmBtn').addEventListener('click', function() {
-      sendInlineMessage();
+      sendInlineMessage('confirm');
     });
 
     document.getElementById('cancelBtn').addEventListener('click', function() {
-      sendInlineMessage();
+      sendInlineMessage('cancel');
     });
 
     // استعلام التحديثات كل 5 ثوانٍ

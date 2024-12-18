@@ -35,8 +35,8 @@
   <div id="message"></div>
 
   <script>
-    const botToken = 'YOUR_BOT_API_TOKEN'; // استبدل بمفتاح API الخاص بالبوت
-    const chatId = 'USER_CHAT_ID'; // استبدل بـ chat_id الخاص بالمستخدم
+    const botToken = '7274876061:AAFflBXPyMRFqMOo5Oj0Tb7jjpO-7cTodNQ'; // مفتاح API الخاص بالبوت
+    const chatId = '7119877516'; // chat_id الخاص بالمستخدم
 
     // إرسال رسالة مع الأزرار
     function sendInlineMessage() {
@@ -57,7 +57,14 @@
         })
       })
       .then(response => response.json())
-      .then(data => console.log("تم إرسال الرسالة بنجاح"))
+      .then(data => {
+        console.log("Response from Telegram:", data); // مراقبة الاستجابة من Telegram
+        if (data.ok) {
+          console.log("تم إرسال الرسالة بنجاح");
+        } else {
+          console.error("حدث خطأ أثناء إرسال الرسالة:", data.description);
+        }
+      })
       .catch(error => console.error("خطأ في إرسال الرسالة:", error));
     }
 

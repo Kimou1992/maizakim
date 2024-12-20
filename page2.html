@@ -1,26 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check Telegram WebApp API</title>
+  <title>TON Payment</title>
+  <script src="https://cdn.tonhubapi.com/tonweb.js"></script>
 </head>
 <body>
-    <h1>Check Telegram WebApp API Status</h1>
-    <button id="checkApiButton">Check WebApp API</button>
-    <p id="statusMessage"></p>
+  <h2>ادفع مبلغ TON</h2>
+  <button id="payButton">ادفع الآن</button>
 
-    <script>
-        // التأكد من أن Telegram WebApp API موجودة
-        document.getElementById("checkApiButton").addEventListener("click", function () {
-            if (window.Telegram && window.Telegram.WebApp) {
-                // تهيئة WebApp إذا كانت API متوفرة
-                Telegram.WebApp.ready();
-                document.getElementById("statusMessage").innerText = "Telegram WebApp API is available!";
-            } else {
-                document.getElementById("statusMessage").innerText = "Telegram WebApp API is not available!";
-            }
+  <script>
+    const tonweb = new TonWeb(); // إنشاء مثيل من TonWeb SDK
+    
+    // تهيئة محفظتك (استبدال عنوان المحفظة الخاصة بك هنا)
+    const walletAddress = 'votre_adresse_wallet';
+
+    document.getElementById('payButton').addEventListener('click', async () => {
+      const amount = 0.01; // المبلغ الذي سيقوم المستخدم بدفعه (بـ TON)
+
+      try {
+        // إنشاء المعاملة وإرسال الدفعة
+        const payment = await tonweb.sendTransaction({
+          to: walletAddress,
+          amount: amount * 1e9, // تحويل المبلغ إلى وحدة النانو TON
+          message: 'دفع عبر mini app'
         });
-    </script>
+
+        console.log('تمت المعاملة بنجاح:', payment);
+        alert('تمت المعاملة بنجاح!');
+      } catch (error) {
+        console.error('فشل المعاملة:', error);
+        alert('حدث خطأ أثناء عملية الدفع.');
+      }
+    });
+  </script>
 </body>
 </html>

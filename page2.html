@@ -1,36 +1,44 @@
 <html>
-<head>
-  <title>TON Payment</title>
-  <script src="https://cdn.tonhubapi.com/tonweb.js"></script>
-</head>
-<body>
-  <h2>ادفع مبلغ TON</h2>
-  <button id="payButton">ادفع الآن</button>
+  <head>
+    <title>TON Payment</title>
+    <script src="https://cdn.tonhubapi.com/tonweb.js"></script>
+  </head>
+  <body>
+    <h2>ادفع مبلغ TON</h2>
+    <button id="payButton">ادفع الآن</button>
 
-  <script>
-    const tonweb = new TonWeb(); // إنشاء مثيل من TonWeb SDK
-    
-    // تهيئة محفظتك (استبدال عنوان المحفظة الخاصة بك هنا)
-    const walletAddress = 'UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl';
+    <script>
+      // إنشاء مثيل من TON Web SDK
+      const tonweb = new TonWeb();
 
-    document.getElementById('payButton').addEventListener('click', async () => {
-      const amount = 0.01; // المبلغ الذي سيقوم المستخدم بدفعه (بـ TON)
+      // عنوان محفظتك
+      const walletAddress = 'UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl';
 
-      try {
-        // إنشاء المعاملة وإرسال الدفعة
-        const payment = await tonweb.sendTransaction({
-          to: walletAddress,
-          amount: amount * 1e9, // تحويل المبلغ إلى وحدة النانو TON
-          message: 'دفع عبر mini app'
-        });
+      document.getElementById('payButton').addEventListener('click', async () => {
+        console.log("تم الضغط على الزر!");
+        const amount = 0.01; // المبلغ الذي سيتم دفعه (بـ TON)
 
-        console.log('تمت المعاملة بنجاح:', payment);
-        alert('تمت المعاملة بنجاح!');
-      } catch (error) {
-        console.error('فشل المعاملة:', error);
-        alert('حدث خطأ أثناء عملية الدفع.');
-      }
-    });
-  </script>
-</body>
+        // فحص إذا كانت المحفظة متصلة
+        if (!tonweb.isConnected()) {
+          alert('لم يتم العثور على محفظة متصلة.');
+          return;
+        }
+
+        try {
+          // إرسال المعاملة
+          const payment = await tonweb.sendTransaction({
+            to: walletAddress,
+            amount: amount * 1e9, // تحويل المبلغ إلى نانو TON
+            message: 'دفع عبر mini app'
+          });
+
+          console.log('تمت المعاملة بنجاح:', payment);
+          alert('تمت المعاملة بنجاح!');
+        } catch (error) {
+          console.error('فشل المعاملة:', error);
+          alert('حدث خطأ أثناء عملية الدفع.');
+        }
+      });
+    </script>
+  </body>
 </html>

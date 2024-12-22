@@ -1,104 +1,110 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini App Interaction with Telegram Bot</title>
+  <title>ربط محفظة Telegram الخاصة بك</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
       text-align: center;
-      padding: 20px;
+    }
+    form {
+      margin: 20px auto;
+      max-width: 400px;
     }
     button {
-      padding: 10px 20px;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
       font-size: 16px;
-      margin: 10px;
-      cursor: pointer;
     }
-    #message {
+    #status {
+      font-size: 18px;
       margin-top: 20px;
-      font-size: 20px;
+    }
+    .linked {
       color: green;
+      font-weight: bold;
+    }
+    .unlinked {
+      color: red;
+      font-weight: bold;
+    }
+    .icon {
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+      margin-left: 10px;
     }
   </style>
 </head>
 <body>
-
-  <h1>تفاعل مع البوت من داخل Mini App</h1>
-  <p>اضغط على الأزرار لتأكيد المعاملة أو إلغائها</p>
-
-  <!-- زر Inline في الـ Mini App -->
-  <button id="confirmBtn">تأكيد المعاملة</button>
-  <button id="cancelBtn">إلغاء المعاملة</button>
-
-  <div id="message"></div>
+  <h3>ربط محفظة Telegram الخاصة بك</h3>
+  <form id="walletForm">
+    <button type="submit">فتح محفظة Telegram لربط المحفظة</button>
+  </form>
+  
+  <div id="status"></div>
+  <div id="walletInfo" style="display: none;">
+    <h4>تم ربط المحفظة بنجاح!</h4>
+    <p>عنوان المحفظة: <span id="walletAddress"></span></p>
+    <p>حالة الربط: <span class="linked">✅ مرتبطة</span></p>
+    <p>إلى جانبك: <img src="https://upload.wikimedia.org/wikipedia/commons/6/60/Telegram_logo_2019.svg" class="icon" alt="Telegram Bot Icon"> <strong>بوت Telegram</strong></p>
+  </div>
 
   <script>
-    const botToken = '7274876061:AAFflBXPyMRFqMOo5Oj0Tb7jjpO-7cTodNQ'; // مفتاح API الخاص بالبوت
-    const chatId = '7119877516'; // chat_id الخاص بالمستخدم
-
-    // إرسال رسالة مع الأزرار
-    function sendInlineMessage(action) {
-      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: "هل أنت متأكد من إتمام المعاملة؟",
-          reply_markup: JSON.stringify({
-            inline_keyboard: [
-              [
-                { text: "تأكيد المعاملة", callback_data: "confirm_transaction" },
-                { text: "إلغاء المعاملة", callback_data: "cancel_transaction" }
-              ]
-            ]
-          })
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log("Response from Telegram:", data); // مراقبة الاستجابة من Telegram
-        if (data.ok) {
-          console.log("تم إرسال الرسالة بنجاح");
-          document.getElementById('message').textContent = action === 'confirm' ? "تم تأكيد المعاملة بنجاح!" : "تم إلغاء المعاملة.";
-        } else {
-          console.error("حدث خطأ أثناء إرسال الرسالة:", data.description);
-        }
-      })
-      .catch(error => console.error("خطأ في إرسال الرسالة:", error));
+    // التحقق من صحة عنوان محفظة TON
+    function isValidTonAddress(address) {
+      return (address.startsWith("EQ") || address.startsWith("UQ")) && address.length >= 48;
     }
 
-    // استلام التحديثات عبر Polling
-    function getUpdates() {
-      fetch(`https://api.telegram.org/bot${botToken}/getUpdates`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.result.length > 0) {
-            const update = data.result[0];
-            const callbackData = update.callback_query ? update.callback_query.data : null;
-            if (callbackData === "confirm_transaction") {
-              document.getElementById('message').textContent = "تم تأكيد المعاملة بنجاح!";
-            } else if (callbackData === "cancel_transaction") {
-              document.getElementById('message').textContent = "تم إلغاء المعاملة.";
-            }
-          }
-        })
-        .catch(error => console.error("خطأ في الحصول على التحديثات:", error));
+    // ربط المحفظة عبر الرابط العميق لفتح Telegram مع بوت
+    document.getElementById('walletForm').addEventListener('submit', function (e) {
+      e.preventDefault(); // منع إعادة تحميل الصفحة
+
+      // الرابط العميق لفتح محفظة Telegram عبر بوت (استبدل برابط البوت الخاص بك)
+      const telegramBotLink = "https://t.me/Tonhakimbot";  // رابط البوت الخاص بك
+      window.location.href = telegramBotLink;  // فتح بوت Telegram
+
+      // إشعار للمستخدم
+      document.getElementById('status').textContent = "يرجى فتح محفظة Telegram وربط المحفظة.";
+      document.getElementById('status').style.color = "blue";
+    });
+
+    // محاكاة عملية ربط المحفظة مع البوت
+    window.onload = function () {
+      // يمكنك استخدام localStorage أو API للحصول على العنوان
+      const savedWallet = localStorage.getItem('walletAddress');
+      
+      const statusElement = document.getElementById('status');
+      const walletInfo = document.getElementById('walletInfo');
+      
+      if (savedWallet) {
+        // إذا كان هناك عنوان محفوظ
+        document.getElementById('walletAddress').textContent = savedWallet;
+        walletInfo.style.display = 'block'; // عرض معلومات المحفظة
+        statusElement.textContent = "محفظتك مرتبطة بنجاح!";
+        statusElement.style.color = 'green';
+      } else {
+        statusElement.textContent = 'لم يتم ربط المحفظة بعد.';
+        statusElement.style.color = 'red';
+      }
+    };
+
+    // محاكاة ربط المحفظة عبر البوت وتخزين العنوان في localStorage
+    function linkWallet() {
+      const walletAddress = "UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl"; // محاكاة العنوان
+      if (isValidTonAddress(walletAddress)) {
+        localStorage.setItem('walletAddress', walletAddress);  // تخزين العنوان
+        window.location.reload(); // تحديث الصفحة لعرض البيانات
+      }
     }
 
-    // بدء التفاعل عندما يضغط المستخدم على الأزرار
-    document.getElementById('confirmBtn').addEventListener('click', function() {
-      sendInlineMessage('confirm');
-    });
-
-    document.getElementById('cancelBtn').addEventListener('click', function() {
-      sendInlineMessage('cancel');
-    });
-
-    // استعلام التحديثات كل 5 ثوانٍ
-    setInterval(getUpdates, 5000);
+    // محاكاة ربط المحفظة عند تحميل الصفحة بعد وقت قصير (افتراضيًا)
+    setTimeout(linkWallet, 2000);  // محاكاة الربط بعد 2 ثانية
   </script>
-
 </body>
 </html>

@@ -39,8 +39,8 @@
   <script>
     // تحقق من صحة عنوان محفظة TON
     function isValidTonAddress(address) {
-      // التحقق فقط من أن العنوان يبدأ بـ EQ وطوله على الأقل 48 حرفًا
-      return address.startsWith("EQ") && address.length >= 48;
+      // التحقق من أن العنوان يبدأ بـ EQ أو UQ وطوله على الأقل 48 حرفًا
+      return (address.startsWith("EQ") || address.startsWith("UQ")) && address.length >= 48;
     }
 
     // ربط المحفظة عند النقر على زر "ربط المحفظة"

@@ -3,73 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ربط محفظة TON</title>
+  <title>Multiple TradingView Widgets</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
       padding: 0;
-      text-align: center;
+      
+      font-family: Arial, sans-serif;
     }
-    form {
-      margin: 20px auto;
-      max-width: 400px;
-    }
-    input, button {
-      width: 100%;
+    .widget-container {
+      width: 310px
+      ;
+    
+      /* يمكنك تعديل العرض حسب الحاجة */
+      margin: 10px auto;
+      background-color: #222;
       padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-    }
-    #status {
-      font-size: 18px;
-      margin-top: 20px;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-  <h3>ربط محفظة TON الخاصة بك</h3>
-  <form id="walletForm">
-    <label for="walletAddress">عنوان المحفظة:</label>
-    <input type="text" id="walletAddress" placeholder="أدخل عنوان محفظتك" required>
-    <button type="submit">ربط المحفظة</button>
-  </form>
-  <p id="status"></p>
 
-  <script>
-    // تحقق من صحة عنوان محفظة TON
-    function isValidTonAddress(address) {
-      // التحقق من أن العنوان يبدأ بـ EQ أو UQ وطوله على الأقل 48 حرفًا
-      return (address.startsWith("EQ") || address.startsWith("UQ")) && address.length >= 48;
-    }
-
-    // ربط المحفظة عند النقر على زر "ربط المحفظة"
-    document.getElementById('walletForm').addEventListener('submit', function (e) {
-      e.preventDefault(); // منع إعادة تحميل الصفحة
-
-      const walletAddress = document.getElementById('walletAddress').value.trim(); // قراءة العنوان
-      const statusElement = document.getElementById('status'); // عنصر عرض الحالة
-
-      if (!isValidTonAddress(walletAddress)) {
-        statusElement.textContent = '❌ عنوان المحفظة غير صالح. تأكد من إدخاله بشكل صحيح.';
-        statusElement.style.color = 'red';
-        return;
+  <!-- TradingView Widget 1 (CRYPTO:NOTUSD) -->
+  <div class="widget-container">
+    <div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <div class="tradingview-widget-copyright">
+        <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
+          <span class="blue-text">Track all markets on TradingView</span>
+        </a>
+      </div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+      {
+        "symbol": "CRYPTO:NOTUSD",
+        "width": "100%",
+        "isTransparent": true,
+        "colorTheme": "dark",
+        "locale": "en"
       }
+      </script>
+    </div>
+  </div>
 
-      // تخزين العنوان محليًا باستخدام localStorage
-      localStorage.setItem('walletAddress', walletAddress);
-      statusElement.textContent = '✅ تم ربط المحفظة بنجاح!';
-      statusElement.style.color = 'green';
-    });
-
-    // عرض العنوان المحفوظ (إذا كان موجودًا)
-    window.onload = function () {
-      const savedWallet = localStorage.getItem('walletAddress');
-      if (savedWallet) {
-        document.getElementById('status').textContent = `🔗 محفظتك المرتبطة: ${savedWallet}`;
-        document.getElementById('status').style.color = 'blue';
+  <!-- TradingView Widget 2 (CRYPTO:TONUSD) -->
+  <div class="widget-container">
+    <div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <div class="tradingview-widget-copyright">
+        <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
+          <span class="blue-text">Track all markets on TradingView</span>
+        </a>
+      </div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+      {
+        "symbol": "CRYPTO:TONUSD",
+        "width": "100%",
+        "isTransparent": true,
+        "colorTheme": "dark",
+        "locale": "en"
       }
-    };
-  </script>
+      </script>
+    </div>
+  </div>
+
 </body>
 </html>

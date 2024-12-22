@@ -1,44 +1,75 @@
-<html>
-  <head>
-    <title>TON Payment</title>
-    <script src="https://cdn.tonhubapi.com/tonweb.js"></script>
-  </head>
-  <body>
-    <h2>ادفع مبلغ TON</h2>
-    <button id="payButton">ادفع الآن</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ربط محفظة TON</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+      text-align: center;
+    }
+    form {
+      margin: 20px auto;
+      max-width: 400px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    #status {
+      font-size: 18px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h3>ربط محفظة TON الخاصة بك</h3>
+  <form id="walletForm">
+    <label for="walletAddress">عنوان المحفظة:</label>
+    <input type="text" id="walletAddress" placeholder="أدخل عنوان محفظتك" required>
+    <button type="submit">ربط المحفظة</button>
+  </form>
+  <p id="status"></p>
 
-    <script>
-      // إنشاء مثيل من TON Web SDK
-      const tonweb = new TonWeb();
+  <script>
+    // تحقق من صحة عنوان محفظة TON
+    function isValidTonAddress(address) {
+      const tonRegex = /^EQ[A-Za-z0-9_-]{48}$/; // صيغة عنوان شبكة TON
+      return tonRegex.test(address);
+    }
 
-      // عنوان محفظتك
-      const walletAddress = 'UQAC7jOqLudpRiHVtN2mcq8OIgtCyBeTxdyWTZlYmFpQVoJl';
+    // ربط المحفظة عند النقر على زر "ربط المحفظة"
+    document.getElementById('walletForm').addEventListener('submit', function (e) {
+      e.preventDefault(); // منع إعادة تحميل الصفحة
 
-      document.getElementById('payButton').addEventListener('click', async () => {
-        console.log("تم الضغط على الزر!");
-        const amount = 0.01; // المبلغ الذي سيتم دفعه (بـ TON)
+      const walletAddress = document.getElementById('walletAddress').value.trim(); // قراءة العنوان
+      const statusElement = document.getElementById('status'); // عنصر عرض الحالة
 
-        // فحص إذا كانت المحفظة متصلة
-        if (!tonweb.isConnected()) {
-          alert('لم يتم العثور على محفظة متصلة.');
-          return;
-        }
+      if (!isValidTonAddress(walletAddress)) {
+        statusElement.textContent = '❌ عنوان المحفظة غير صالح. تأكد من إدخاله بشكل صحيح.';
+        statusElement.style.color = 'red';
+        return;
+      }
 
-        try {
-          // إرسال المعاملة
-          const payment = await tonweb.sendTransaction({
-            to: walletAddress,
-            amount: amount * 1e9, // تحويل المبلغ إلى نانو TON
-            message: 'دفع عبر mini app'
-          });
+      // تخزين العنوان محليًا باستخدام localStorage
+      localStorage.setItem('walletAddress', walletAddress);
+      statusElement.textContent = '✅ تم ربط المحفظة بنجاح!';
+      statusElement.style.color = 'green';
+    });
 
-          console.log('تمت المعاملة بنجاح:', payment);
-          alert('تمت المعاملة بنجاح!');
-        } catch (error) {
-          console.error('فشل المعاملة:', error);
-          alert('حدث خطأ أثناء عملية الدفع.');
-        }
-      });
-    </script>
-  </body>
+    // عرض العنوان المحفوظ (إذا كان موجودًا)
+    window.onload = function () {
+      const savedWallet = localStorage.getItem('walletAddress');
+      if (savedWallet) {
+        document.getElementById('status').textContent = `🔗 محفظتك المرتبطة: ${savedWallet}`;
+        document.getElementById('status').style.color = 'blue';
+      }
+    };
+  </script>
+</body>
 </html>

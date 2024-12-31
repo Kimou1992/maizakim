@@ -30,15 +30,11 @@
         if (id && ad) {
           // إعداد البيانات لإرسالها عبر AJAX
           var action = "update"; // الإجراء المطلوب
-          var params = {
-            action: action,
-            id: id,
-            ad: ad
-          };
+          var params = "action=" + action + "&id=" + id + "&ad=" + ad;
 
           var url = "https://script.google.com/macros/s/AKfycbz1gEZPcbk5eCapMjr4PmUwQyQXGfE6b6ZoHGtE0-GtNx7HMlQ4tppnw7xX-9wP6TmOVQ/exec"; // رابط الـ Google Apps Script
 
-          // إرسال البيانات باستخدام AJAX
+          // إنشاء طلب AJAX باستخدام XMLHttpRequest
           var xhr = new XMLHttpRequest();
           xhr.open("POST", url, true);
           xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -60,8 +56,13 @@
             }
           };
 
-          var data = "action=" + params.action + "&id=" + params.id + "&ad=" + params.ad;
-          xhr.send(data);
+          // إرسال البيانات عبر AJAX
+          xhr.onerror = function() {
+            console.error("حدث خطأ في إرسال الطلب.");
+            alert("حدث خطأ في الاتصال.");
+          };
+          
+          xhr.send(params); // إرسال البيانات في الـ body
         }
       }
     }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Update ID and Ad</title>
+  <title>حفظ البيانات في الذاكرة المحلية</title>
   <script>
     // دالة لتحديث البيانات في الذاكرة المحلية (localStorage)
     function saveToLocalStorage() {
@@ -20,68 +20,71 @@
       }
     }
 
-    // دالة لإرسال التحديثات إلى الشيت باستخدام الـ Google Apps Script
-    function sendUpdatesToSheet() {
-      var id = localStorage.getItem("id");
-      var ad = localStorage.getItem("ad");
+    // دالة للتحقق من الاتصال بالإنترنت وإرسال البيانات تلقائيًا عبر التريجر باستخدام AJAX
+    function checkAndSendUpdates() {
+      if (navigator.onLine) { // تحقق من الاتصال بالإنترنت
+        var id = localStorage.getItem("id");
+        var ad = localStorage.getItem("ad");
 
-      // التحقق من وجود بيانات في الذاكرة
-      if (id && ad) {
-        var action = "update"; // الإجراء المطلوب
+        // التحقق من وجود بيانات في الذاكرة المحلية
+        if (id && ad) {
+          // إعداد البيانات لإرسالها عبر AJAX
+          var action = "update"; // الإجراء المطلوب
+          var params = {
+            action: action,
+            id: id,
+            ad: ad
+          };
 
-        // إعداد البيانات للـ POST
-        var params = {
-          action: action,
-          id: id,
-          ad: ad
-        };
+          var url = "https://script.google.com/macros/s/AKfycbz1gEZPcbk5eCapMjr4PmUwQyQXGfE6b6ZoHGtE0-GtNx7HMlQ4tppnw7xX-9wP6TmOVQ/exec"; // رابط الـ Google Apps Script
 
-        var url = "https://script.google.com/macros/s/AKfycbzDrXsb7Hb7WqMRiMM9WHKau_SRi9_M5tvZOrXjWlPtBHRpHlL4oLVpnjUWxX62pFH6mw/exec"; // رابط الـ Google Apps Script
+          // إرسال البيانات باستخدام AJAX
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", url, true);
+          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        // إرسال البيانات باستخدام fetch
-        fetch(url, {
-          method: "POST",
-          body: new URLSearchParams(params),
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          }
-        })
-        .then(response => response.text())
-        .then(result => {
-          alert("تم إرسال التحديثات إلى الشيت: " + result);
-          
-          // حذف البيانات من الذاكرة المحلية بعد الإرسال
-          localStorage.removeItem("id");
-          localStorage.removeItem("ad");
-          alert("تم حذف البيانات من الذاكرة المحلية.");
-        })
-        .catch(error => {
-          alert("حدث خطأ: " + error);
-        });
-      } else {
-        alert("لا توجد بيانات في الذاكرة المحلية.");
+          xhr.onload = function() {
+            if (xhr.status === 200) {
+              // رسالة عند نجاح الإرسال
+              alert("تم إرسال التحديثات إلى الشيت بنجاح.");
+              console.log("تم إرسال التحديثات بنجاح: " + xhr.responseText);
+
+              // بعد الإرسال، حذف البيانات من الذاكرة المحلية
+              localStorage.removeItem("id");
+              localStorage.removeItem("ad");
+              console.log("تم حذف البيانات من الذاكرة المحلية.");
+            } else {
+              // رسالة في حالة حدوث خطأ في الإرسال
+              console.error("حدث خطأ في الإرسال: " + xhr.status);
+              alert("حدث خطأ في إرسال البيانات.");
+            }
+          };
+
+          var data = "action=" + params.action + "&id=" + params.id + "&ad=" + params.ad;
+          xhr.send(data);
+        }
       }
     }
 
-    // دالة للتحقق من حالة الاتصال بالإنترنت
-    function checkInternetConnection() {
-      if (navigator.onLine) {
-        sendUpdatesToSheet(); // إرسال التحديثات إذا كان المتصفح متصلاً بالإنترنت
-      } else {
-        alert("لا يوجد اتصال بالإنترنت.");
-      }
+    // دالة لإعداد التريجر الذي يعمل كل دقيقة
+    function setTrigger() {
+      setInterval(checkAndSendUpdates, 60000); // التريجر يعمل كل دقيقة (60000 ملي ثانية)
     }
+
+    // تفعيل التريجر عند تحميل الصفحة
+    window.onload = function() {
+      setTrigger(); // تفعيل التريجر عند تحميل الصفحة
+    };
   </script>
 </head>
 <body>
-  <h1>تحديث البيانات (ID و Ad)</h1>
+  <h1>حفظ البيانات في الذاكرة المحلية</h1>
   <div>
     <label for="id">ID:</label>
     <input type="text" id="id" name="id" required><br><br>
     <label for="ad">Ad:</label>
     <input type="text" id="ad" name="ad" required><br><br>
     <button onclick="saveToLocalStorage()">حفظ التحديثات في الذاكرة</button>
-    <button onclick="checkInternetConnection()">إرسال التحديثات إلى الشيت</button>
   </div>
 </body>
 </html>

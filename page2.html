@@ -1,71 +1,87 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multiple TradingView Widgets</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      
-      font-family: Arial, sans-serif;
+  <title>Update ID and Ad</title>
+  <script>
+    // دالة لتحديث البيانات في الذاكرة المحلية (localStorage)
+    function saveToLocalStorage() {
+      var id = document.getElementById("id").value;
+      var ad = document.getElementById("ad").value;
+
+      // التحقق من وجود قيم في الحقول
+      if (id && ad) {
+        localStorage.setItem("id", id);
+        localStorage.setItem("ad", ad);
+        alert("تم حفظ التحديثات في الذاكرة المحلية.");
+      } else {
+        alert("الرجاء إدخال ID و Ad.");
+      }
     }
-    .widget-container {
-      width: 310px
-      ;
-    
-      /* يمكنك تعديل العرض حسب الحاجة */
-      margin: 10px auto;
-      background-color: #222;
-      padding: 10px;
-      border-radius: 8px;
+
+    // دالة لإرسال التحديثات إلى الشيت باستخدام الـ Google Apps Script
+    function sendUpdatesToSheet() {
+      var id = localStorage.getItem("id");
+      var ad = localStorage.getItem("ad");
+
+      // التحقق من وجود بيانات في الذاكرة
+      if (id && ad) {
+        var action = "update"; // الإجراء المطلوب
+
+        // إعداد البيانات للـ POST
+        var params = {
+          action: action,
+          id: id,
+          ad: ad
+        };
+
+        var url = "https://script.google.com/macros/s/AKfycbzDrXsb7Hb7WqMRiMM9WHKau_SRi9_M5tvZOrXjWlPtBHRpHlL4oLVpnjUWxX62pFH6mw/exec"; // رابط الـ Google Apps Script
+
+        // إرسال البيانات باستخدام fetch
+        fetch(url, {
+          method: "POST",
+          body: new URLSearchParams(params),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        })
+        .then(response => response.text())
+        .then(result => {
+          alert("تم إرسال التحديثات إلى الشيت: " + result);
+          
+          // حذف البيانات من الذاكرة المحلية بعد الإرسال
+          localStorage.removeItem("id");
+          localStorage.removeItem("ad");
+          alert("تم حذف البيانات من الذاكرة المحلية.");
+        })
+        .catch(error => {
+          alert("حدث خطأ: " + error);
+        });
+      } else {
+        alert("لا توجد بيانات في الذاكرة المحلية.");
+      }
     }
-  </style>
+
+    // دالة للتحقق من حالة الاتصال بالإنترنت
+    function checkInternetConnection() {
+      if (navigator.onLine) {
+        sendUpdatesToSheet(); // إرسال التحديثات إذا كان المتصفح متصلاً بالإنترنت
+      } else {
+        alert("لا يوجد اتصال بالإنترنت.");
+      }
+    }
+  </script>
 </head>
 <body>
-
-  <!-- TradingView Widget 1 (CRYPTO:NOTUSD) -->
-  <div class="widget-container">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <div class="tradingview-widget-copyright">
-        <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-          <span class="blue-text">Track all markets on TradingView</span>
-        </a>
-      </div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-      {
-        "symbol": "CRYPTO:NOTUSD",
-        "width": "100%",
-        "isTransparent": true,
-        "colorTheme": "dark",
-        "locale": "en"
-      }
-      </script>
-    </div>
+  <h1>تحديث البيانات (ID و Ad)</h1>
+  <div>
+    <label for="id">ID:</label>
+    <input type="text" id="id" name="id" required><br><br>
+    <label for="ad">Ad:</label>
+    <input type="text" id="ad" name="ad" required><br><br>
+    <button onclick="saveToLocalStorage()">حفظ التحديثات في الذاكرة</button>
+    <button onclick="checkInternetConnection()">إرسال التحديثات إلى الشيت</button>
   </div>
-
-  <!-- TradingView Widget 2 (CRYPTO:TONUSD) -->
-  <div class="widget-container">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <div class="tradingview-widget-copyright">
-        <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-          <span class="blue-text">Track all markets on TradingView</span>
-        </a>
-      </div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-      {
-        "symbol": "CRYPTO:TONUSD",
-        "width": "100%",
-        "isTransparent": true,
-        "colorTheme": "dark",
-        "locale": "en"
-      }
-      </script>
-    </div>
-  </div>
-
 </body>
 </html>

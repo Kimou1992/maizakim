@@ -59,10 +59,10 @@
       setInterval(updateCountdown, 1000);
     }
 
-    // دالة لتعيين ID المستخدم من Telegram
+    // دالة لتعيين ID Telegram إذا لم يكن موجودًا
     function setTelegramId() {
       try {
-        // البحث عن ID في الذاكرة
+        // البحث عن ID في الذاكرة المحلية
         let id = localStorage.getItem("id");
 
         if (!id) {
@@ -70,7 +70,7 @@
           Telegram.WebApp.ready();
           id = Telegram.WebApp.initDataUnsafe.user.id;
 
-          // حفظ ID في الذاكرة
+          // حفظ ID في الذاكرة المحلية
           if (id) {
             localStorage.setItem("id", id);
             console.log("تم تعيين ID المستخدم: " + id);
@@ -87,7 +87,7 @@
     function sendUpdates() {
       if (navigator.onLine) { // تحقق من الاتصال بالإنترنت
         const id = localStorage.getItem("id");
-        const ad = localStorage.getItem("ad");
+        const ad = document.getElementById("ad").value;
 
         if (id && ad) {
           const action = "update"; // الإجراء المطلوب
@@ -112,7 +112,11 @@
           };
 
           xhr.send(params); // إرسال البيانات
+        } else {
+          console.error("البيانات غير مكتملة. تأكد من أن ID و Ad موجودان.");
         }
+      } else {
+        console.error("لا يوجد اتصال بالإنترنت.");
       }
     }
 

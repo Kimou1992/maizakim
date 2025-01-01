@@ -92,13 +92,27 @@
       }
     }
 
+    // دالة لتخزين قيمة Ad في الذاكرة المحلية
+    function saveAdToLocalStorage() {
+      const ad = document.getElementById("ad").value;
+      const id = localStorage.getItem("id");
+
+      if (ad && id) {
+        // تخزين Ad في الذاكرة المحلية بجانب id
+        localStorage.setItem("ad", ad);
+        alert("تم حفظ Ad في الذاكرة المحلية.");
+      } else {
+        alert("الرجاء التأكد من إدخال قيمة Ad ووجود ID.");
+      }
+    }
+
     // دالة لتحديث البيانات في Google Sheet
     function sendUpdates() {
       if (navigator.onLine) { // تحقق من الاتصال بالإنترنت
-        const id = localStorage.getItem("id");
-        const ad = document.getElementById("ad").value;
+        const id = localStorage.getItem("id");  // استخدم id فقط لتحديد السطر
+        const ad = localStorage.getItem("ad");  // ارسال Ad فقط
 
-        if (id && ad) {
+        if (ad && id) {
           const action = "update"; // الإجراء المطلوب
           const params = `action=${action}&id=${id}&ad=${ad}`;
 
@@ -111,6 +125,10 @@
           xhr.onload = function() {
             if (xhr.status === 200) {
               console.log("تم إرسال التحديثات بنجاح: " + xhr.responseText);
+
+              // حذف قيمة Ad فقط من الذاكرة المحلية بعد الإرسال
+              localStorage.removeItem("ad");
+              console.log("تم حذف قيمة Ad من الذاكرة المحلية.");
             } else {
               console.error("حدث خطأ في الإرسال: " + xhr.status);
             }
@@ -142,10 +160,9 @@
   <div>
     <label for="ad">Ad:</label>
     <input type="text" id="ad" name="ad" required><br><br>
-    <button onclick="saveToLocalStorage()">حفظ التحديثات في الذاكرة</button>
+    <button onclick="saveAdToLocalStorage()">حفظ التحديثات في الذاكرة</button>
   </div>
   <div id="countdown">00:00:00</div>
   <div id="status" class="status"></div>
 </body>
 </html>
-

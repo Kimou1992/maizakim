@@ -27,6 +27,12 @@
       margin: 10px;
       padding: 10px;
     }
+
+    .id-display {
+      font-size: 18px;
+      color: blue;
+      margin: 10px;
+    }
   </style>
   <script>
     // دالة لبدء العد التنازلي
@@ -78,6 +84,9 @@
             console.error("لم يتم العثور على ID التلجرام.");
           }
         }
+
+        // عرض ID المستخدم في الواجهة
+        document.getElementById("telegram-id-display").textContent = `ID التلجرام الخاص بك: ${id}`;
       } catch (error) {
         console.error("حدث خطأ أثناء تعيين ID التلجرام:", error);
       }
@@ -129,6 +138,7 @@
 </head>
 <body>
   <h1>عداد تنازلي مع تخزين البيانات</h1>
+  <div class="id-display" id="telegram-id-display">ID التلجرام الخاص بك: جاري تحميل ID...</div>
   <div>
     <label for="ad">Ad:</label>
     <input type="text" id="ad" name="ad" required><br><br>

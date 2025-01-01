@@ -4,11 +4,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>حفظ البيانات في الذاكرة المحلية</title>
+  <style>
+    #countdown {
+      font-size: 24px;
+      color: #333;
+      margin: 20px 0;
+    }
+  </style>
   <script>
+    // دالة لحساب العد التنازلي بناءً على الوقت الفعلي
+    function startCountdown() {
+      const countdownElement = document.getElementById("countdown");
+
+      // تحديث العداد كل ثانية
+      setInterval(() => {
+        const now = new Date();
+        const seconds = now.getSeconds();
+        const remainingSeconds = 31 - (seconds % 60);
+
+        // حساب الوقت المتبقي حتى وقت التريجر
+        const minutes = Math.floor((60 - seconds) / 60);
+        countdownElement.textContent = `00:${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+
+        if (remainingSeconds <= 0) {
+          countdownElement.textContent = "00:00:31"; // إعادة العد التنازلي عند التريجر
+        }
+      }, 1000);
+    }
+
     // دالة لتحديث البيانات في الذاكرة المحلية (localStorage)
     function saveToLocalStorage() {
-      var id = document.getElementById("id").value;
-      var ad = document.getElementById("ad").value;
+      const id = document.getElementById("id").value;
+      const ad = document.getElementById("ad").value;
 
       // التحقق من وجود قيم في الحقول
       if (id && ad) {
@@ -23,46 +50,41 @@
     // دالة للتحقق من الاتصال بالإنترنت وإرسال البيانات تلقائيًا عبر التريجر باستخدام AJAX
     function checkAndSendUpdates() {
       if (navigator.onLine) { // تحقق من الاتصال بالإنترنت
-        var id = localStorage.getItem("id");
-        var ad = localStorage.getItem("ad");
+        const id = localStorage.getItem("id");
+        const ad = localStorage.getItem("ad");
 
         // التحقق من وجود بيانات في الذاكرة المحلية
         if (id && ad) {
-          // إعداد البيانات لإرسالها عبر AJAX
-          var action = "update"; // الإجراء المطلوب
-          var params = "action=" + action + "&id=" + id + "&ad=" + ad;
+          const action = "update"; // الإجراء المطلوب
+          const params = "action=" + action + "&id=" + id + "&ad=" + ad;
 
-          var url = "https://script.google.com/macros/s/AKfycbz1gEZPcbk5eCapMjr4PmUwQyQXGfE6b6ZoHGtE0-GtNx7HMlQ4tppnw7xX-9wP6TmOVQ/exec"; // رابط الـ Google Apps Script
+          const url = "https://script.google.com/macros/s/AKfycbz1gEZPcbk5eCapMjr4PmUwQyQXGfE6b6ZoHGtE0-GtNx7HMlQ4tppnw7xX-9wP6TmOVQ/exec"; // رابط الـ Google Apps Script
 
-          // إنشاء طلب AJAX باستخدام XMLHttpRequest
-          var xhr = new XMLHttpRequest();
+          const xhr = new XMLHttpRequest();
           xhr.open("POST", url, true);
           xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
           xhr.onload = function() {
             if (xhr.status === 200) {
-              // رسالة عند نجاح الإرسال
               alert("تم إرسال التحديثات إلى الشيت بنجاح.");
               console.log("تم إرسال التحديثات بنجاح: " + xhr.responseText);
 
-              // بعد الإرسال، حذف البيانات من الذاكرة المحلية
+              // حذف البيانات من الذاكرة المحلية بعد الإرسال
               localStorage.removeItem("id");
               localStorage.removeItem("ad");
               console.log("تم حذف البيانات من الذاكرة المحلية.");
             } else {
-              // رسالة في حالة حدوث خطأ في الإرسال
               console.error("حدث خطأ في الإرسال: " + xhr.status);
               alert("حدث خطأ في إرسال البيانات.");
             }
           };
 
-          // إرسال البيانات عبر AJAX
           xhr.onerror = function() {
             console.error("حدث خطأ في إرسال الطلب.");
             alert("حدث خطأ في الاتصال.");
           };
-          
-          xhr.send(params); // إرسال البيانات في الـ body
+
+          xhr.send(params); // إرسال البيانات
         }
       }
     }
@@ -72,9 +94,10 @@
       setInterval(checkAndSendUpdates, 60000); // التريجر يعمل كل دقيقة (60000 ملي ثانية)
     }
 
-    // تفعيل التريجر عند تحميل الصفحة
+    // عند تحميل الصفحة: بدء العداد وتفعيل التريجر
     window.onload = function() {
-      setTrigger(); // تفعيل التريجر عند تحميل الصفحة
+      startCountdown(); // بدء العداد التنازلي
+      setTrigger(); // تفعيل التريجر
     };
   </script>
 </head>
@@ -87,5 +110,6 @@
     <input type="text" id="ad" name="ad" required><br><br>
     <button onclick="saveToLocalStorage()">حفظ التحديثات في الذاكرة</button>
   </div>
+  <div id="countdown">00:00:31</div>
 </body>
 </html>

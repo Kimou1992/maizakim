@@ -3,33 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>حفظ البيانات في الذاكرة المحلية</title>
+  <title>عداد تنازلي مع تخزين البيانات</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+
     #countdown {
-      font-size: 24px;
+      font-size: 36px;
       color: #333;
       margin: 20px 0;
+    }
+
+    .status {
+      font-size: 18px;
+      color: green;
+    }
+
+    input, button {
+      font-size: 18px;
+      margin: 10px;
+      padding: 10px;
     }
   </style>
   <script>
     // دالة لحساب العد التنازلي بناءً على الوقت الفعلي
     function startCountdown() {
       const countdownElement = document.getElementById("countdown");
+      const statusElement = document.getElementById("status");
 
-      // تحديث العداد كل ثانية
-      setInterval(() => {
+      function updateCountdown() {
         const now = new Date();
         const seconds = now.getSeconds();
-        const remainingSeconds = 31 - (seconds % 60);
 
-        // حساب الوقت المتبقي حتى وقت التريجر
-        const minutes = Math.floor((60 - seconds) / 60);
-        countdownElement.textContent = `00:${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
-
-        if (remainingSeconds <= 0) {
-          countdownElement.textContent = "00:00:31"; // إعادة العد التنازلي عند التريجر
+        // حساب الوقت المتبقي حتى 31 ثانية من الدقيقة الموالية
+        let remainingSeconds = 31 - seconds;
+        if (remainingSeconds < 0) {
+          remainingSeconds += 60; // إعادة العد من 60
         }
-      }, 1000);
+
+        // تحديث واجهة المستخدم
+        countdownElement.textContent = `00:00:${String(remainingSeconds).padStart(2, "0")}`;
+
+        // إذا وصل إلى 31 ثانية، تشغيل التريجر الافتراضي
+        if (remainingSeconds === 0) {
+          statusElement.textContent = "تم تشغيل التريجر الآن!";
+          sendUpdates(); // إرسال البيانات عند التريجر
+          setTimeout(() => (statusElement.textContent = ""), 2000); // مسح الرسالة بعد ثانيتين
+        }
+      }
+
+      // تحديث العداد كل ثانية
+      setInterval(updateCountdown, 1000);
     }
 
     // دالة لتحديث البيانات في الذاكرة المحلية (localStorage)
@@ -47,8 +74,8 @@
       }
     }
 
-    // دالة للتحقق من الاتصال بالإنترنت وإرسال البيانات تلقائيًا عبر التريجر باستخدام AJAX
-    function checkAndSendUpdates() {
+    // دالة لإرسال البيانات تلقائيًا عند التريجر
+    function sendUpdates() {
       if (navigator.onLine) { // تحقق من الاتصال بالإنترنت
         const id = localStorage.getItem("id");
         const ad = localStorage.getItem("ad");
@@ -89,20 +116,14 @@
       }
     }
 
-    // دالة لإعداد التريجر الذي يعمل كل دقيقة
-    function setTrigger() {
-      setInterval(checkAndSendUpdates, 60000); // التريجر يعمل كل دقيقة (60000 ملي ثانية)
-    }
-
-    // عند تحميل الصفحة: بدء العداد وتفعيل التريجر
+    // عند تحميل الصفحة: بدء العداد
     window.onload = function() {
-      startCountdown(); // بدء العداد التنازلي
-      setTrigger(); // تفعيل التريجر
+      startCountdown();
     };
   </script>
 </head>
 <body>
-  <h1>حفظ البيانات في الذاكرة المحلية</h1>
+  <h1>عداد تنازلي مع تخزين البيانات</h1>
   <div>
     <label for="id">ID:</label>
     <input type="text" id="id" name="id" required><br><br>
@@ -110,6 +131,7 @@
     <input type="text" id="ad" name="ad" required><br><br>
     <button onclick="saveToLocalStorage()">حفظ التحديثات في الذاكرة</button>
   </div>
-  <div id="countdown">00:00:31</div>
+  <div id="countdown">00:00:00</div>
+  <div id="status" class="status"></div>
 </body>
 </html>

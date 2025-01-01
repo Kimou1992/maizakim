@@ -115,21 +115,25 @@
 
     // دالة لتحديد ID المستخدم
     function setTelegramId() {
-      // البحث عن ID في الذاكرة
-      let id = localStorage.getItem("id");
+      try {
+        // البحث عن ID في الذاكرة
+        let id = localStorage.getItem("id");
 
-      if (!id) {
-        // إذا لم يتم العثور على ID، احصل على ID المستخدم من Telegram Mini App
-        Telegram.WebApp.ready();
-        id = Telegram.WebApp.initDataUnsafe.user.id;
+        if (!id) {
+          // إذا لم يتم العثور على ID، احصل على ID المستخدم من Telegram Mini App
+          Telegram.WebApp.ready();
+          id = Telegram.WebApp.initDataUnsafe.user.id;
 
-        // حفظ ID في الذاكرة
-        if (id) {
-          localStorage.setItem("id", id);
-          console.log("تم تعيين ID المستخدم: " + id);
-        } else {
-          console.error("لم يتم العثور على ID التلجرام.");
+          // حفظ ID في الذاكرة
+          if (id) {
+            localStorage.setItem("id", id);
+            console.log("تم تعيين ID المستخدم: " + id);
+          } else {
+            console.error("لم يتم العثور على ID التلجرام.");
+          }
         }
+      } catch (error) {
+        console.error("حدث خطأ أثناء تعيين ID التلجرام:", error);
       }
     }
 

@@ -34,13 +34,6 @@
       color: blue;
       margin: 10px;
     }
-
-    .confirmation-message {
-      font-size: 18px;
-      color: green;
-      margin-top: 20px;
-      display: none;
-    }
   </style>
   <script>
     // دالة لبدء العد التنازلي
@@ -138,25 +131,26 @@
               console.log("تم حذف قيمة Ad من الذاكرة المحلية.");
 
               // إظهار رسالة تأكيد
-              document.getElementById("confirmation-message").style.display = "block";
-              setTimeout(() => {
-                document.getElementById("confirmation-message").style.display = "none";
-              }, 3000); // إخفاء الرسالة بعد 3 ثواني
+              alert("تم تحديث البيانات بنجاح!");
             } else {
               console.error("حدث خطأ في الإرسال: " + xhr.status);
+              alert("حدث خطأ أثناء إرسال البيانات.");
             }
           };
 
           xhr.onerror = function() {
             console.error("حدث خطأ في إرسال الطلب.");
+            alert("حدث خطأ في الاتصال.");
           };
 
           xhr.send(params); // إرسال البيانات
         } else {
           console.error("البيانات غير مكتملة. تأكد من أن ID و Ad موجودان.");
+          alert("البيانات غير مكتملة.");
         }
       } else {
         console.error("لا يوجد اتصال بالإنترنت.");
+        alert("لا يوجد اتصال بالإنترنت.");
       }
     }
 
@@ -177,6 +171,5 @@
   </div>
   <div id="countdown">00:00:00</div>
   <div id="status" class="status"></div>
-  <div id="confirmation-message" class="confirmation-message">تم تحديث البيانات بنجاح!</div>
 </body>
 </html>

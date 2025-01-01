@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>عداد تنازلي مع تخزين البيانات</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -65,14 +66,14 @@
       setInterval(updateCountdown, 1000);
     }
 
-    // دالة لتعيين ID Telegram إذا لم يكن موجودًا
+    // دالة لتعيين ID التلجرام
     function setTelegramId() {
       try {
         // البحث عن ID في الذاكرة المحلية
         let id = localStorage.getItem("id");
 
         if (!id) {
-          // إذا لم يتم العثور على ID، احصل عليه من Telegram Mini App
+          // إذا لم يتم العثور على ID، احصل عليه من Telegram API
           Telegram.WebApp.ready();
           id = Telegram.WebApp.initDataUnsafe.user.id;
 
@@ -147,3 +148,4 @@
   <div id="status" class="status"></div>
 </body>
 </html>
+

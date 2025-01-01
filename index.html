@@ -1,39 +1,150 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Telegram Mini App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عداد تنازلي مع تخزين البيانات</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    #countdown {
+      font-size: 36px;
+      color: #333;
+      margin: 20px 0;
+    }
+
+    .status {
+      font-size: 18px;
+      color: green;
+    }
+
+    input, button {
+      font-size: 18px;
+      margin: 10px;
+      padding: 10px;
+    }
+
+    .id-display {
+      font-size: 18px;
+      color: blue;
+      margin: 10px;
+    }
+  </style>
+  <script>
+    // دالة لبدء العد التنازلي
+    function startCountdown() {
+      const countdownElement = document.getElementById("countdown");
+      const statusElement = document.getElementById("status");
+
+      function updateCountdown() {
+        const now = new Date();
+        const currentSeconds = now.getSeconds();
+
+        // حساب الوقت المتبقي حتى 31 ثانية في الدقيقة القادمة
+        let remainingSeconds = 31 - currentSeconds;
+        if (remainingSeconds < 0) {
+          remainingSeconds += 60; // إعادة العد من 60
+        }
+
+        // تحديث واجهة المستخدم
+        countdownElement.textContent = `00:00:${String(remainingSeconds).padStart(2, "0")}`;
+
+        // تشغيل التريجر عند الوصول إلى 31 ثانية
+        if (remainingSeconds === 0) {
+          statusElement.textContent = "تم تشغيل التريجر الآن!";
+          sendUpdates(); // إرسال البيانات عند التريجر
+          setTimeout(() => (statusElement.textContent = ""), 2000); // مسح الرسالة بعد ثانيتين
+        }
+      }
+
+      // تحديث العداد كل ثانية
+      setInterval(updateCountdown, 1000);
+    }
+
+    // دالة لتعيين ID التلجرام
+    function setTelegramId() {
+      try {
+        // البحث عن ID في الذاكرة المحلية
+        let id = localStorage.getItem("id");
+
+        if (!id) {
+          // إذا لم يتم العثور على ID، احصل عليه من Telegram API
+          Telegram.WebApp.ready();
+          id = Telegram.WebApp.initDataUnsafe.user.id;
+
+          // حفظ ID في الذاكرة المحلية
+          if (id) {
+            localStorage.setItem("id", id);
+          } else {
+            console.error("لم يتم العثور على ID التلجرام.");
+          }
+        }
+
+        // عرض ID المستخدم في الواجهة بشكل مباشر
+        document.getElementById("telegram-id-display").textContent = `ID التلجرام: ${id}`;
+      } catch (error) {
+        console.error("حدث خطأ أثناء تعيين ID التلجرام:", error);
+      }
+    }
+
+    // دالة لتحديث البيانات في Google Sheet
+    function sendUpdates() {
+      if (navigator.onLine) { // تحقق من الاتصال بالإنترنت
+        const id = localStorage.getItem("id");
+        const ad = document.getElementById("ad").value;
+
+        if (id && ad) {
+          const action = "update"; // الإجراء المطلوب
+          const params = `action=${action}&id=${id}&ad=${ad}`;
+
+          const url = "https://script.google.com/macros/s/AKfycbz1gEZPcbk5eCapMjr4PmUwQyQXGfE6b6ZoHGtE0-GtNx7HMlQ4tppnw7xX-9wP6TmOVQ/exec"; // رابط Google Apps Script
+
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", url, true);
+          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+          xhr.onload = function() {
+            if (xhr.status === 200) {
+              console.log("تم إرسال التحديثات بنجاح: " + xhr.responseText);
+            } else {
+              console.error("حدث خطأ في الإرسال: " + xhr.status);
+            }
+          };
+
+          xhr.onerror = function() {
+            console.error("حدث خطأ في إرسال الطلب.");
+          };
+
+          xhr.send(params); // إرسال البيانات
+        } else {
+          console.error("البيانات غير مكتملة. تأكد من أن ID و Ad موجودان.");
+        }
+      } else {
+        console.error("لا يوجد اتصال بالإنترنت.");
+      }
+    }
+
+    // عند تحميل الصفحة: تعيين ID التلجرام وتشغيل العداد
+    window.onload = function() {
+      setTelegramId();
+      startCountdown();
+    };
+  </script>
 </head>
 <body>
-    <h1>Welcome to My Mini App</h1>
-    <p id="user-info">Loading...</p>
-
-    <script>
-        Telegram.WebApp.ready();
-
-        // قراءة بيانات المستخدم
-        const user = Telegram.WebApp.initDataUnsafe.user;
-
-        if (user) {
-            const userInfo = `User ID: ${user.id}, Name: ${user.first_name}, Username: ${user.username}`;
-            document.getElementById('user-info').innerText = userInfo;
-
-            // إرسال البيانات إلى الخادم لتخزينها
-            fetch('https://your-backend-url.com/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: user.id,
-                    first_name: user.first_name,
-                    username: user.username
-                })
-            });
-        } else {
-            document.getElementById('user-info').innerText = "User data not available.";
-        }
-    </script>
+  <h1>عداد تنازلي مع تخزين البيانات</h1>
+  <div class="id-display" id="telegram-id-display">ID التلجرام: جاري التحميل...</div>
+  <div>
+    <label for="ad">Ad:</label>
+    <input type="text" id="ad" name="ad" required><br><br>
+    <button onclick="saveToLocalStorage()">حفظ التحديثات في الذاكرة</button>
+  </div>
+  <div id="countdown">00:00:00</div>
+  <div id="status" class="status"></div>
 </body>
 </html>
-

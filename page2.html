@@ -34,6 +34,13 @@
       color: blue;
       margin: 10px;
     }
+
+    .confirmation-message {
+      font-size: 18px;
+      color: green;
+      margin-top: 20px;
+      display: none;
+    }
   </style>
   <script>
     // دالة لبدء العد التنازلي
@@ -129,6 +136,12 @@
               // حذف قيمة Ad فقط من الذاكرة المحلية بعد الإرسال
               localStorage.removeItem("ad");
               console.log("تم حذف قيمة Ad من الذاكرة المحلية.");
+
+              // إظهار رسالة تأكيد
+              document.getElementById("confirmation-message").style.display = "block";
+              setTimeout(() => {
+                document.getElementById("confirmation-message").style.display = "none";
+              }, 3000); // إخفاء الرسالة بعد 3 ثواني
             } else {
               console.error("حدث خطأ في الإرسال: " + xhr.status);
             }
@@ -164,5 +177,6 @@
   </div>
   <div id="countdown">00:00:00</div>
   <div id="status" class="status"></div>
+  <div id="confirmation-message" class="confirmation-message">تم تحديث البيانات بنجاح!</div>
 </body>
 </html>

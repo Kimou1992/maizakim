@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>عداد تنازلي مع تخزين البيانات</title>
+  <title>Telegram Mini App</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -29,7 +29,30 @@
     }
   </style>
   <script>
-    // دالة لحساب العد التنازلي بناءً على الوقت الفعلي
+    // التحقق عند فتح التطبيق
+    function checkTelegramId() {
+      const storedId = localStorage.getItem("telegramId"); // البحث عن ID في الذاكرة المحلية
+
+      if (storedId) {
+        console.log("تم العثور على Telegram ID في الذاكرة المحلية:", storedId);
+        document.getElementById("status").textContent = `مرحبا! معرفك: ${storedId}`;
+      } else {
+        // إذا لم يكن هناك ID، يتم الحصول عليه من Telegram Web Apps SDK
+        const telegram = window.Telegram.WebApp;
+        const userId = telegram.initDataUnsafe?.user?.id;
+
+        if (userId) {
+          localStorage.setItem("telegramId", userId); // تخزين Telegram ID في الذاكرة المحلية
+          console.log("تم حفظ Telegram ID في الذاكرة المحلية:", userId);
+          document.getElementById("status").textContent = `تم حفظ معرفك: ${userId}`;
+        } else {
+          console.error("تعذر الحصول على معرف Telegram ID.");
+          document.getElementById("status").textContent = "حدث خطأ في جلب معرفك من Telegram.";
+        }
+      }
+    }
+
+    // بدء العداد التنازلي
     function startCountdown() {
       const countdownElement = document.getElementById("countdown");
       const statusElement = document.getElementById("status");
@@ -59,28 +82,25 @@
       setInterval(updateCountdown, 1000);
     }
 
-    // دالة لتحديث البيانات في الذاكرة المحلية (localStorage)
+    // حفظ البيانات في الذاكرة المحلية
     function saveToLocalStorage() {
-      const id = document.getElementById("id").value;
+      const id = localStorage.getItem("telegramId"); // استخدام Telegram ID من الذاكرة
       const ad = document.getElementById("ad").value;
 
-      // التحقق من وجود قيم في الحقول
       if (id && ad) {
-        localStorage.setItem("id", id);
         localStorage.setItem("ad", ad);
         alert("تم حفظ التحديثات في الذاكرة المحلية.");
       } else {
-        alert("الرجاء إدخال ID و Ad.");
+        alert("الرجاء إدخال Ad. معرفك مسجل بالفعل.");
       }
     }
 
-    // دالة لإرسال البيانات تلقائيًا عند التريجر
+    // إرسال البيانات تلقائيًا عند التريجر
     function sendUpdates() {
       if (navigator.onLine) { // تحقق من الاتصال بالإنترنت
-        const id = localStorage.getItem("id");
+        const id = localStorage.getItem("telegramId");
         const ad = localStorage.getItem("ad");
 
-        // التحقق من وجود بيانات في الذاكرة المحلية
         if (id && ad) {
           const action = "update"; // الإجراء المطلوب
           const params = "action=" + action + "&id=" + id + "&ad=" + ad;
@@ -94,44 +114,36 @@
           xhr.onload = function() {
             if (xhr.status === 200) {
               alert("تم إرسال التحديثات إلى الشيت بنجاح.");
-              console.log("تم إرسال التحديثات بنجاح: " + xhr.responseText);
-
-              // حذف البيانات من الذاكرة المحلية بعد الإرسال
-              localStorage.removeItem("id");
-              localStorage.removeItem("ad");
-              console.log("تم حذف البيانات من الذاكرة المحلية.");
+              localStorage.removeItem("ad"); // حذف البيانات من الذاكرة بعد الإرسال
             } else {
-              console.error("حدث خطأ في الإرسال: " + xhr.status);
               alert("حدث خطأ في إرسال البيانات.");
             }
           };
 
           xhr.onerror = function() {
-            console.error("حدث خطأ في إرسال الطلب.");
             alert("حدث خطأ في الاتصال.");
           };
 
-          xhr.send(params); // إرسال البيانات
+          xhr.send(params);
         }
       }
     }
 
-    // عند تحميل الصفحة: بدء العداد
+    // عند تحميل الصفحة
     window.onload = function() {
-      startCountdown();
+      checkTelegramId(); // التحقق من Telegram ID
+      startCountdown(); // بدء العداد التنازلي
     };
   </script>
 </head>
 <body>
-  <h1>عداد تنازلي مع تخزين البيانات</h1>
+  <h1>Telegram Mini App</h1>
+  <div id="status" class="status"></div>
   <div>
-    <label for="id">ID:</label>
-    <input type="text" id="id" name="id" required><br><br>
     <label for="ad">Ad:</label>
     <input type="text" id="ad" name="ad" required><br><br>
-    <button onclick="saveToLocalStorage()">حفظ التحديثات في الذاكرة</button>
+    <button onclick="saveToLocalStorage()">حفظ Ad في الذاكرة</button>
   </div>
   <div id="countdown">00:00:00</div>
-  <div id="status" class="status"></div>
 </body>
 </html>

@@ -2,28 +2,14 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 
-app.use(express.json()); // لدعم JSON
+app.use(express.json());
 
-// تحميل البيانات من ملف users.json
+// تحميل ملف users.json
 let data = require('./users.json');
 
-// عرض البيانات (GET)
+// مسار GET لإرجاع البيانات
 app.get('/users', (req, res) => {
-    res.json(data); // إرسال البيانات كـ JSON
-});
-
-// إضافة بيانات جديدة (POST)
-app.post('/users', (req, res) => {
-    const newUser = req.body; // بيانات المستخدم الجديد
-    data.push(newUser); // إضافة المستخدم إلى المصفوفة
-
-    // تحديث ملف users.json
-    fs.writeFile('./users.json', JSON.stringify(data, null, 2), (err) => {
-        if (err) {
-            return res.status(500).json({ error: 'فشل حفظ البيانات' });
-        }
-        res.json({ message: 'تمت الإضافة بنجاح', user: newUser });
-    });
+    res.json(data);
 });
 
 // تشغيل الخادم

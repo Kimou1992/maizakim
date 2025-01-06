@@ -1,113 +1,33 @@
 const express = require('express');
 const fs = require('fs');
-const path = require('path');
 const app = express();
-const port = process.env.PORT || 3000;
 
-// تمكين الطلبات من إرسال بيانات بتنسيق JSON
-app.use(express.json());
+app.use(express.json()); // لدعم JSON
 
-// مسار ملف JSON الذي يحتوي على بيانات المستخدمين
-const dataFilePath = path.join(__dirname, 'users.json');
+// تحميل البيانات من ملف users.json
+let data = require('./users.json');
 
-// نقطة النهاية للحصول على بيانات مستخدم معين
-app.get('/api/getUser/:id', (req, res) => {
-  const userId = req.params.id;
-
-  fs.readFile(dataFilePath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ message: 'Error reading file' });
-    }
-
-    let users = JSON.parse(data);
-    const user = users.find(u => u.id == userId);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    res.json(user); // إرجاع بيانات المستخدم
-  });
+// عرض البيانات (GET)
+app.get('/users', (req, res) => {
+    res.json(data); // إرسال البيانات كـ JSON
 });
 
-// نقطة النهاية لإضافة بيانات مستخدم جديد
-app.post('/api/addUser', (req, res) => {
-  const newUser = req.body;
+// إضافة بيانات جديدة (POST)
+app.post('/users', (req, res) => {
+    const newUser = req.body; // بيانات المستخدم الجديد
+    data.push(newUser); // إضافة المستخدم إلى المصفوفة
 
-  fs.readFile(dataFilePath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ message: 'Error reading file' });
-    }
-
-    let users = JSON.parse(data);
-    users.push(newUser); // إضافة المستخدم الجديد إلى المصفوفة
-
-    fs.writeFile(dataFilePath, JSON.stringify(users, null, 2), (err) => {
-      if (err) {
-        return res.status(500).json({ message: 'Error writing to file' });
-      }
-      res.status(201).json(newUser); // إرجاع المستخدم الذي تم إضافته
+    // تحديث ملف users.json
+    fs.writeFile('./users.json', JSON.stringify(data, null, 2), (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'فشل حفظ البيانات' });
+        }
+        res.json({ message: 'تمت الإضافة بنجاح', user: newUser });
     });
-  });
 });
 
-// نقطة النهاية لتحديث بيانات مستخدم
-app.put('/api/updateUser/:id', (req, res) => {
-  const userId = req.params.id;
-  const updatedData = req.body;
-
-  fs.readFile(dataFilePath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ message: 'Error reading file' });
-    }
-
-    let users = JSON.parse(data);
-    let user = users.find(u => u.id == userId);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    user = { ...user, ...updatedData }; // دمج البيانات الجديدة مع البيانات القديمة
-    users = users.map(u => u.id == userId ? user : u); // تحديث البيانات في المصفوفة
-
-    fs.writeFile(dataFilePath, JSON.stringify(users, null, 2), (err) => {
-      if (err) {
-        return res.status(500).json({ message: 'Error writing to file' });
-      }
-      res.json(user); // إرجاع البيانات المحدثة للمستخدم
-    });
-  });
-});
-
-// نقطة النهاية لحذف بيانات مستخدم
-app.delete('/api/deleteUser/:id', (req, res) => {
-  const userId = req.params.id;
-
-  fs.readFile(dataFilePath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ message: 'Error reading file' });
-    }
-
-    let users = JSON.parse(data);
-    const userExists = users.some(u => u.id == userId);
-
-    if (!userExists) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    users = users.filter(u => u.id != userId); // إزالة المستخدم من المصفوفة
-
-    fs.writeFile(dataFilePath, JSON.stringify(users, null, 2), (err) => {
-      if (err) {
-        return res.status(500).json({ message: 'Error writing to file' });
-      }
-      res.status(204).end(); // رد بنجاح دون محتوى
-    });
-  });
-});
-
-// بدء الخادم
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+// تشغيل الخادم
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });

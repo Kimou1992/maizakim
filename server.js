@@ -6,12 +6,13 @@ const path = require('path');
 // لتفعيل تحليل بيانات JSON في الجسم
 app.use(express.json());
 
-const dataFile = path.join(__dirname, 'data.json');
+const dataFile = path.join(__dirname, 'users.json'); // استبدال data.json بـ users.json
 
 // نقطة النهاية لجلب المستخدمين
 app.get('/users', (req, res) => {
     fs.readFile(dataFile, 'utf8', (err, data) => {
         if (err) {
+            console.error('Error reading the file:', err); // طباعة تفاصيل الخطأ
             return res.status(500).json({ error: 'حدث خطأ أثناء قراءة البيانات' });
         }
         res.json(JSON.parse(data)); // إرجاع بيانات المستخدمين
@@ -25,6 +26,7 @@ app.put('/users/:id', (req, res) => {
 
     fs.readFile(dataFile, 'utf8', (err, data) => {
         if (err) {
+            console.error('Error reading the file:', err); // طباعة تفاصيل الخطأ
             return res.status(500).json({ error: 'حدث خطأ أثناء قراءة البيانات' });
         }
 
@@ -38,9 +40,10 @@ app.put('/users/:id', (req, res) => {
         // تحديث الاسم
         users[userIndex].username = username;
 
-        // حفظ البيانات المعدلة في ملف JSON
+        // حفظ البيانات المعدلة في ملف users.json
         fs.writeFile(dataFile, JSON.stringify(users, null, 2), 'utf8', (err) => {
             if (err) {
+                console.error('Error saving the file:', err); // طباعة تفاصيل الخطأ عند حفظ البيانات
                 return res.status(500).json({ error: 'حدث خطأ أثناء حفظ البيانات' });
             }
             // إرجاع المستخدم المعدل

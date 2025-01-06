@@ -1,0 +1,12 @@
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "description": "تطبيق بسيط باستخدام Node.js",
+  "main": "server.js",  // استبدله بملف الخادم الرئيسي في مشروعك
+  "scripts": {
+    "start": "node server.js"  // أمر لتشغيل تطبيقك
+  },
+  "dependencies": {
+    "express": "^4.17.1"  // إذا كنت تستخدم Express.js أو أي مكتبة أخرى
+  }
+}

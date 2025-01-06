@@ -1,19 +1,23 @@
 const express = require('express');
+const cors = require('cors');
 const fs = require('fs');
 const app = express();
 
-app.use(express.json());
+// تمكين CORS لجميع الطلبات
+app.use(cors());
 
-// تحميل ملف users.json
-let data = require('./users.json');
-
-// مسار GET لإرجاع البيانات
+// نقطة النهاية لقراءة بيانات المستخدمين من ملف JSON
 app.get('/users', (req, res) => {
-    res.json(data);
+    // قراءة ملف JSON
+    fs.readFile('users.json', 'utf8', (err, data) => {
+        if (err) {
+            res.status(500).send('خطأ في قراءة البيانات');
+            return;
+        }
+        res.json(JSON.parse(data));
+    });
 });
 
-// تشغيل الخادم
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+app.listen(3000, () => {
+    console.log('Server is running on http://localhost:3000');
 });

@@ -1,18 +1,20 @@
-# Use the official Node.js image
+# استخدام صورة Node.js
 FROM node:16
 
-# Set the working directory
+# تعيين المجلد للعمل
 WORKDIR /app
 
-# Copy the package.json and install dependencies
-COPY package*.json ./
+# نسخ ملفات المشروع إلى المجلد
+COPY package.json package-lock.json ./
+
+# تثبيت التبعيات
 RUN npm install
 
-# Copy the rest of the application files
+# نسخ جميع الملفات الأخرى
 COPY . .
 
-# Expose the port the app will run on
+# تحديد المنفذ الذي سيستمع عليه التطبيق
 EXPOSE 3000
 
-# Command to run the app
-CMD ["node", "server.js"]
+# بدء التطبيق
+CMD ["npm", "start"]

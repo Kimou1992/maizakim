@@ -1,45 +1,29 @@
 const express = require('express');
 const { Client } = require('pg');
+
+// إنشاء تطبيق Express
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware to parse JSON requests
-app.use(express.json());
-
-// Connect to PostgreSQL database using environment variable
+// الاتصال بقاعدة البيانات باستخدام الرابط المخزن في المتغير البيئي
 const client = new Client({
-  connectionString: process.env.DATABASE_URL,  // قيمة الاتصال من المتغير البيئي
+  connectionString: process.env.DATABASE_URL,  // استخدام المتغير البيئي
   ssl: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false  // إذا كانت قاعدة البيانات تتطلب SSL
   }
 });
 
+// محاولة الاتصال بقاعدة البيانات
 client.connect()
-  .then(() => console.log('Connected to PostgreSQL'))
+  .then(() => console.log('Connected to PostgreSQL database'))
   .catch(err => console.error('Connection error', err.stack));
 
-// Simple route for testing
+// إعداد واجهة API بسيطة
 app.get('/', (req, res) => {
-  res.send('Hello, World!');
+  res.send('Hello from the Render app!');
 });
 
-// Route to handle POST requests
-app.post('/data', (req, res) => {
-  const { firstName, lastName, address } = req.body;
-  
-  const query = 'INSERT INTO users (first_name, last_name, address) VALUES ($1, $2, $3) RETURNING *';
-  const values = [firstName, lastName, address];
-  
-  client.query(query, values)
-    .then(result => {
-      res.json({ message: 'Data received and stored', data: result.rows[0] });
-    })
-    .catch(err => {
-      res.status(500).json({ error: err.message });
-    });
-});
-
-// Start server
+// بدء السيرفر
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

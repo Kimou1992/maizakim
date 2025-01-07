@@ -5,10 +5,10 @@ FROM node:16
 WORKDIR /app
 
 # نسخ ملفات المشروع إلى المجلد
-COPY package.json package-lock.json ./
+COPY package.json ./
 
-# تثبيت التبعيات
-RUN npm install
+# تثبيت التبعيات دون الحاجة إلى package-lock.json
+RUN npm install --no-package-lock
 
 # نسخ جميع الملفات الأخرى
 COPY . .

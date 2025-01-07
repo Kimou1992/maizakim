@@ -1,49 +1,35 @@
-// استيراد المكتبات
-require('dotenv').config();  // لتحميل المتغيرات البيئية من ملف .env
+// تحميل مكتبة dotenv لتحميل المتغيرات البيئية إذا كنت تعمل محلياً (تأكد من أن ملف .env موجود)
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config(); // تحميل المتغيرات البيئية من .env في حالة بيئة التطوير
+}
 
+// استيراد مكتبة PostgreSQL
+const { Client } = require('pg');
+
+// إعدادات الاتصال بقاعدة البيانات باستخدام المتغيرات البيئية
+const client = new Client({
+  user: process.env.PGUSER,        // سيتم تحميله من متغير البيئة
+  host: process.env.PGHOST,        // سيتم تحميله من متغير البيئة
+  database: process.env.PGDATABASE,// سيتم تحميله من متغير البيئة
+  password: process.env.PGPASSWORD,// سيتم تحميله من متغير البيئة
+  port: process.env.PGPORT,        // سيتم تحميله من متغير البيئة
+});
+
+// محاولة الاتصال بقاعدة البيانات
+client.connect()
+  .then(() => console.log('Connected to PostgreSQL'))
+  .catch(err => console.error('Connection error', err.stack));
+
+// إعداد خادم HTTP بسيط باستخدام Express
 const express = require('express');
-const { Pool } = require('pg');
-const cors = require('cors');
-
-// إنشاء تطبيق Express
 const app = express();
+const port = process.env.PORT || 3000; // استخدام المتغير البيئي PORT أو الافتراضي 3000
 
-// تفعيل CORS
-app.use(cors());
-
-// الإعدادات
-const PORT = process.env.PORT || 3000; // استخدم المنفذ الذي توفره Render أو 3000 افتراضيًا
-
-// الاتصال بقاعدة بيانات PostgreSQL
-const pool = new Pool({
-  user: process.env.PGUSER,
-  host: process.env.PGHOST,
-  database: process.env.PGDATABASE,
-  password: process.env.PGPASSWORD,
-  port: process.env.PGPORT || 5432,  // إذا كان المنفذ غير محدد، استخدم 5432
-});
-
-pool.connect()
-  .then(() => console.log('تم الاتصال بقاعدة البيانات بنجاح!'))
-  .catch(err => console.error('خطأ في الاتصال بقاعدة البيانات:', err));
-
-// تعريف نقطة النهاية
 app.get('/', (req, res) => {
-  res.send('الخادم يعمل!');
+  res.send('Hello World!');
 });
 
-// نقطة النهاية للتفاعل مع قاعدة البيانات (مثال: استعلام للحصول على بيانات)
-app.get('/get-users', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM users'); // تعديل الاستعلام حسب احتياجاتك
-    res.json(result.rows); // إرسال البيانات على هيئة JSON
-  } catch (error) {
-    console.error('خطأ أثناء استعلام قاعدة البيانات:', error);
-    res.status(500).send('حدث خطأ في الخادم');
-  }
-});
-
-// تشغيل الخادم
-app.listen(PORT, () => {
-  console.log(`الخادم يعمل على المنفذ ${PORT}`);
+// بدء الخادم
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });

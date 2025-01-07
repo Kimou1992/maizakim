@@ -1,62 +1,31 @@
-// استيراد مكتبة CORS
-const cors = require('cors');
 const express = require('express');
-const fs = require('fs');
+const { Pool } = require('pg');
+const cors = require('cors'); // مكتبة لدعم CORS
 const app = express();
 
-// تفعيل CORS للسماح بالوصول من أي مصدر
-app.use(cors()); // هذا يتيح الوصول من أي موقع
+app.use(cors()); // تمكين CORS للسماح بالوصول من جميع النطاقات
+app.use(express.json()); // لدعم قراءة بيانات JSON
 
-// أو يمكنك تحديد مصادر معينة (إذا كنت تريد السماح فقط بموقع معين):
-// app.use(cors({
-//     origin: 'https://example.com' // استبدل بـ URL الخاص بموقعك
-// }));
-
-// إعدادات الـ API الأخرى (مثل الـ POST و GET و PUT)
-app.use(express.json()); // لتفسير الـ JSON في الجسم
-
-const dataFile = './users.json'; // تأكد من مسار الملف الصحيح
-
-// تعريف المسارات (مثال)
-app.get('/users', (req, res) => {
-    fs.readFile(dataFile, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).json({ error: 'حدث خطأ في قراءة البيانات' });
-        }
-        res.json(JSON.parse(data));
-    });
+// إعداد الاتصال بقاعدة البيانات باستخدام متغيرات البيئة
+const pool = new Pool({
+  user: process.env.PGUSER,       // اسم المستخدم لقاعدة البيانات من متغيرات البيئة
+  host: process.env.PGHOST,       // اسم المضيف لقاعدة البيانات من متغيرات البيئة
+  database: process.env.PGDATABASE, // اسم قاعدة البيانات من متغيرات البيئة
+  password: process.env.PGPASSWORD, // كلمة المرور لقاعدة البيانات من متغيرات البيئة
+  port: process.env.PGPORT || 5432, // المنفذ (افتراضي 5432)
 });
 
-// تعديل المستخدم (مثال PUT)
-app.put('/users/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-    const { username } = req.body;
-
-    fs.readFile(dataFile, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).json({ error: 'حدث خطأ أثناء قراءة البيانات' });
-        }
-
-        const users = JSON.parse(data);
-        const userIndex = users.findIndex(user => user.id === userId);
-
-        if (userIndex === -1) {
-            return res.status(404).json({ error: 'المستخدم غير موجود' });
-        }
-
-        users[userIndex].username = username;
-
-        fs.writeFile(dataFile, JSON.stringify(users, null, 2), 'utf8', (err) => {
-            if (err) {
-                return res.status(500).json({ error: 'حدث خطأ أثناء حفظ البيانات' });
-            }
-            res.json(users[userIndex]); // إرجاع المستخدم المعدل
-        });
-    });
+// endpoint لجلب البيانات من قاعدة البيانات
+app.get('/data', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM users'); // استعلام لجلب البيانات
+    res.json(result.rows); // إرسال البيانات كـ JSON
+  } catch (err) {
+    console.error('Error querying database:', err);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
-// بدء الخادم
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`الخادم يعمل على المنفذ ${PORT}`);
-});
+// تشغيل الخادم
+const PORT = process.env.PORT || 3000; // استخدم المتغيرات البيئية أو المنفذ الافتراضي
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

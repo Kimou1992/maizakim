@@ -6,9 +6,9 @@ const port = process.env.PORT || 3000;
 // Middleware to parse JSON requests
 app.use(express.json());
 
-// Connect to PostgreSQL database
+// Connect to PostgreSQL database using environment variable
 const client = new Client({
-  connectionString: process.env.DATABASE_URL, // استخدام المتغير البيئي
+  connectionString: process.env.DATABASE_URL,  // قيمة الاتصال من المتغير البيئي
   ssl: {
     rejectUnauthorized: false
   }

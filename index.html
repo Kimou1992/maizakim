@@ -1,42 +1,53 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مقارنة البيانات</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحقق من الكلمة</title>
 </head>
 <body>
-  <h1>مقارنة البيانات السرية</h1>
-  <form id="compareForm">
-    <label for="inputData">أدخل البيانات:</label>
-    <input type="text" id="inputData" name="inputData" required>
-    <button type="submit">قارن</button>
-  </form>
+    <h1>تحقق من الكلمة</h1>
+    <form id="checkForm">
+        <label for="word">أدخل الكلمة:</label>
+        <input type="text" id="word" name="word" required>
+        <button type="submit">تحقق</button>
+    </form>
+    <p id="result"></p>
 
-  <p id="result"></p>
+    <script>
+        const form = document.getElementById('checkForm');
+        const result = document.getElementById('result');
 
-  <script>
-    // إرسال البيانات إلى الخادم عند تقديم النموذج
-    document.getElementById('compareForm').addEventListener('submit', function(event) {
-      event.preventDefault();
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const word = document.getElementById('word').value;
 
-      const inputData = document.getElementById('inputData').value;
+            try {
+                const response = await fetch('/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ word })
+                });
 
-      fetch('/compare', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ input: inputData })
-      })
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById('result').innerText = data.message;
-      })
-      .catch(error => {
-        console.error('حدث خطأ:', error);
-      });
-    });
-  </script>
+                if (!response.ok) {
+                    throw new Error('استجابة غير صحيحة من الخادم');
+                }
+
+                const data = await response.json();
+                if (data.valid) {
+                    result.textContent = 'الكلمة صحيحة!';
+                    result.style.color = 'green';
+                } else {
+                    result.textContent = 'الكلمة غير صحيحة!';
+                    result.style.color = 'red';
+                }
+            } catch (error) {
+                result.textContent = `حدث خطأ: ${error.message}`;
+                result.style.color = 'red';
+            }
+        });
+    </script>
 </body>
 </html>

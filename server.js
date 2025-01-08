@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // قراءة البيانات السرية من ملف .env أو Secret File
-const secretFilePath = '/etc/secrets/secret.txt'; // قم بتغيير المسار حسب الحاجة
+const secretFilePath = '/etc/secrets/<secret>'; // قم بتغيير المسار حسب الحاجة
 let secretData = '';
 
 // قراءة الملف عند بدء الخادم

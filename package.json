@@ -1,12 +1,17 @@
 {
-  "name": "simple-web-service",
+  "name": "simple-env-project",
   "version": "1.0.0",
-  "description": "A simple web service without PostgreSQL",
+  "description": "A simple project to demonstrate environment variables",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "dotenv": "^10.0.0"
+  },
+  "engines": {
+    "node": "14.x",
+    "npm": "6.x"
   }
 }

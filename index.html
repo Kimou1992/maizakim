@@ -21,6 +21,12 @@
 <body>
     <h1>مرحبًا بك في تطبيق Node.js</h1>
     <p>تم تشغيل هذا التطبيق بنجاح باستخدام Docker و Render!</p>
-    <p>رابط قاعدة البيانات: <a href="<%= databaseUrl %>"><%= databaseUrl %></a></p>
+    <p>رابط قاعدة البيانات: <span id="database-url">جارٍ تحميل الرابط...</span></p>
+
+    <script>
+        // إرسال الرابط من متغير البيئة إلى HTML عبر JavaScript
+        const databaseUrl = "<%= process.env.DATABASE_URL || 'URL غير محدد' %>";
+        document.getElementById('database-url').innerText = databaseUrl;
+    </script>
 </body>
 </html>

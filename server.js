@@ -1,20 +1,24 @@
 const express = require('express');
 const app = express();
-const path = require('path');
+const port = process.env.PORT || 3000;
 
-// تعيين البورت الذي سيعمل عليه التطبيق
-const PORT = process.env.PORT || 3000;
+// استيراد المتغير البيئي
+const MNH = process.env.MNH;
 
-// مسار لخدمة الملفات الثابتة (مثل HTML و CSS و JS)
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
+app.use(express.json());
 
-// المسار الرئيسي الذي يعرض صفحة HTML
-app.get('/', (req, res) => {
-    const databaseUrl = process.env.DATABASE_URL || "URL غير محدد"; // جلب الرابط من المتغير البيئي
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.post('/verify', (req, res) => {
+    const { word } = req.body;
+
+    // التحقق من الكلمة
+    if (word === MNH) {
+        res.json({ valid: true });
+    } else {
+        res.json({ valid: false });
+    }
 });
 
-// بدء الخادم على البورت المحدد
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });

@@ -2,12 +2,15 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// استيراد المتغير البيئي
-const MNH = process.env.MNH;
+// طباعة المتغير البيئي للتحقق
+console.log('متغير MNH:', process.env.MNH);
 
-// التحقق من وجود المتغير البيئي
+const MNH = process.env.MNH;
 if (!MNH) {
-    console.error('ملاحظة: المتغير البيئي MNH غير مضبوط!');
+    console.error('المتغير البيئي MNH غير مضبوط!');
+    process.exit(1);  // إيقاف الخادم إذا لم يتم ضبط المتغير
+} else {
+    console.log(`تم ضبط المتغير البيئي MNH: ${MNH}`);
 }
 
 app.use(express.static('public'));

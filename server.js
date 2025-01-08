@@ -6,11 +6,12 @@ const port = process.env.PORT || 3000;
 
 // استخدام رابط ثابت لاختبار الاتصال
 const client = new Client({
-  connectionString: 'postgresql://usdt_exchange_user:viPVkXuyXiy45QN3xXCSXqNSKrwxaU2U@dpg-ctu4ckjv2p9s738oqch0-a/usdt_exchange',
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false,
   }
 });
+
 
 client.connect()
   .then(() => console.log('✅ Connected to PostgreSQL database'))

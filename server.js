@@ -1,32 +1,38 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const app = express();
-const port = process.env.PORT || 3000;
 
-// طباعة المتغير البيئي للتحقق
-console.log('متغير MNH:', process.env.MNH);
-
-const MNH = process.env.MNH;
-if (!MNH) {
-    console.error('المتغير البيئي MNH غير مضبوط!');
-    process.exit(1);  // إيقاف الخادم إذا لم يتم ضبط المتغير
-} else {
-    console.log(`تم ضبط المتغير البيئي MNH: ${MNH}`);
-}
-
-app.use(express.static('public'));
+// استخدم JSON لتفسير البيانات المدخلة
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.post('/verify', (req, res) => {
-    const { word } = req.body;
+// قراءة البيانات السرية من ملف .env أو Secret File
+const secretFilePath = '/etc/secrets/secret.txt'; // قم بتغيير المسار حسب الحاجة
+let secretData = '';
 
-    // التحقق من الكلمة المدخلة
-    if (word === MNH) {
-        res.json({ valid: true });
-    } else {
-        res.json({ valid: false });
-    }
+// قراءة الملف عند بدء الخادم
+fs.readFile(secretFilePath, 'utf8', (err, data) => {
+  if (err) {
+    console.error('خطأ في قراءة الملف السرية:', err);
+  } else {
+    secretData = data.trim();  // احفظ البيانات السرية
+  }
 });
 
+// نقطة النهاية للمقارنة
+app.post('/compare', (req, res) => {
+  const inputData = req.body.input;  // استلام المدخل من المستخدم
+
+  if (inputData === secretData) {
+    res.json({ message: 'البيانات متطابقة' });
+  } else {
+    res.json({ message: 'البيانات غير متطابقة' });
+  }
+});
+
+// بدء الخادم
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
-    console.log(`الخادم يعمل على المنفذ ${port}`);
+  console.log(`الخادم يعمل على المنفذ ${port}`);
 });

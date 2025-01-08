@@ -3,30 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تجربة قاعدة البيانات</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        h1 {
-            color: #4CAF50;
-        }
-        p {
-            font-size: 20px;
-        }
-    </style>
+    <title>تحقق الكلمة</title>
 </head>
 <body>
-    <h1>مرحبًا بك في تطبيق Node.js</h1>
-    <p>تم تشغيل هذا التطبيق بنجاح باستخدام Docker و Render!</p>
-    <p>رابط قاعدة البيانات: <span id="database-url">جارٍ تحميل الرابط...</span></p>
+    <h1>تحقق من الكلمة</h1>
+    <form id="checkForm">
+        <label for="word">أدخل الكلمة:</label>
+        <input type="text" id="word" name="word" required>
+        <button type="submit">تحقق</button>
+    </form>
+    <p id="result"></p>
 
     <script>
-        // إرسال الرابط من متغير البيئة إلى HTML عبر JavaScript
-        const databaseUrl = "<%= process.env.DATABASE_URL || 'URL غير محدد' %>";
-        document.getElementById('database-url').innerText = databaseUrl;
+        const form = document.getElementById('checkForm');
+        const result = document.getElementById('result');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const word = document.getElementById('word').value;
+
+            try {
+                const response = await fetch('/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ word })
+                });
+
+                const data = await response.json();
+                if (data.valid) {
+                    result.textContent = 'الكلمة صحيحة!';
+                    result.style.color = 'green';
+                } else {
+                    result.textContent = 'الكلمة غير صحيحة!';
+                    result.style.color = 'red';
+                }
+            } catch (error) {
+                result.textContent = 'حدث خطأ!';
+                result.style.color = 'red';
+            }
+        });
     </script>
 </body>
 </html>

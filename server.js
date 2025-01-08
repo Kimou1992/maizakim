@@ -1,15 +1,15 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
-const port = 3000;
 
-// الوصول إلى المتغيرات البيئية
-const dbUser = process.env.DB_USER;  // مثال على متغير البيئة
-const dbPassword = process.env.DB_PASSWORD;  // مثال على متغير البيئة
+const mySecret = process.env.MY_SECRET;
+const myApiKey = process.env.API_KEY;
 
 app.get('/', (req, res) => {
-  res.send(`DB User: ${dbUser}, DB Password: ${dbPassword}`);
+  res.send(`Secret: ${mySecret}, API Key: ${myApiKey}`);
 });
 
+const port = 3000;
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });

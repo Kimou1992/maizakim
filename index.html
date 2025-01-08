@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحقق الكلمة</title>
+    <title>تحقق من الكلمة</title>
 </head>
 <body>
     <h1>تحقق من الكلمة</h1>
@@ -31,6 +31,10 @@
                     body: JSON.stringify({ word })
                 });
 
+                if (!response.ok) {
+                    throw new Error('استجابة غير صحيحة من الخادم');
+                }
+
                 const data = await response.json();
                 if (data.valid) {
                     result.textContent = 'الكلمة صحيحة!';
@@ -40,7 +44,7 @@
                     result.style.color = 'red';
                 }
             } catch (error) {
-                result.textContent = 'حدث خطأ!';
+                result.textContent = `حدث خطأ: ${error.message}`;
                 result.style.color = 'red';
             }
         });

@@ -2,9 +2,6 @@ const express = require('express');
 const app = express();
 const path = require('path');
 
-// إعداد EJS كـ view engine
-app.set('view engine', 'ejs');
-
 // تعيين البورت الذي سيعمل عليه التطبيق
 const PORT = process.env.PORT || 3000;
 
@@ -13,8 +10,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // المسار الرئيسي الذي يعرض صفحة HTML
 app.get('/', (req, res) => {
-    const databaseUrl = process.env.DATABASE_URL || "URL غير محدد"; // جلب رابط قاعدة البيانات من المتغير البيئي
-    res.render('index', { databaseUrl });  // تمرير الرابط إلى HTML
+    const databaseUrl = process.env.DATABASE_URL || "URL غير محدد"; // جلب الرابط من المتغير البيئي
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // بدء الخادم على البورت المحدد

@@ -1,13 +1,16 @@
-// استيراد مكتبة Express
 const express = require('express');
 const app = express();
+const path = require('path');
 
-// استخدام المتغير البيئي PORT أو تعيينه إلى 3000
+// تعيين البورت الذي سيعمل عليه التطبيق
 const PORT = process.env.PORT || 3000;
 
-// إعداد مسار GET افتراضي
+// مسار لخدمة الملفات الثابتة (مثل HTML و CSS و JS)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// المسار الرئيسي الذي يعرض صفحة HTML
 app.get('/', (req, res) => {
-    res.send('Hello, World! This is your app running on Render.');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // بدء الخادم على البورت المحدد

@@ -2,8 +2,9 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
-const dbUser = process.env.DB_USER; // الوصول إلى متغير البيئة
-const dbPassword = process.env.DB_PASSWORD; 
+// الوصول إلى المتغيرات البيئية
+const dbUser = process.env.DB_USER;  // مثال على متغير البيئة
+const dbPassword = process.env.DB_PASSWORD;  // مثال على متغير البيئة
 
 app.get('/', (req, res) => {
   res.send(`DB User: ${dbUser}, DB Password: ${dbPassword}`);

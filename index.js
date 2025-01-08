@@ -1,19 +1,16 @@
-require('dotenv').config(); // لتحميل المتغيرات البيئية من ملف .env
-const mysql = require('mysql2');
+// استيراد مكتبة Express
+const express = require('express');
+const app = express();
 
-// إعداد الاتصال بقاعدة البيانات باستخدام المتغيرات البيئية
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
+// استخدام المتغير البيئي PORT أو تعيينه إلى 3000
+const PORT = process.env.PORT || 3000;
+
+// إعداد مسار GET افتراضي
+app.get('/', (req, res) => {
+    res.send('Hello, World! This is your app running on Render.');
 });
 
-// الاتصال بقاعدة البيانات والتحقق من الاتصال
-connection.connect(err => {
-  if (err) {
-    console.error('Error connecting: ' + err.stack);
-    return;
-  }
-  console.log('Connected to database as id ' + connection.threadId);
+// بدء الخادم على البورت المحدد
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });

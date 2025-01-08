@@ -1,12 +1,14 @@
 {
-  "name": "render-app",
+  "name": "postgres-example",
   "version": "1.0.0",
+  "description": "Example app with PostgreSQL",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.17.1",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "dotenv": "^10.0.0"
   }
 }

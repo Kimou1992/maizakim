@@ -1,53 +1,32 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحقق من الكلمة</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Database App</title>
 </head>
 <body>
-    <h1>تحقق من الكلمة</h1>
-    <form id="checkForm">
-        <label for="word">أدخل الكلمة:</label>
-        <input type="text" id="word" name="word" required>
-        <button type="submit">تحقق</button>
-    </form>
-    <p id="result"></p>
+  <h1>إضافة بيانات إلى قاعدة البيانات</h1>
+  <form action="/add" method="POST">
+    <label>الاسم الأول:</label>
+    <input type="text" name="firstName" required><br><br>
+    <label>اسم العائلة:</label>
+    <input type="text" name="lastName" required><br><br>
+    <label>العنوان:</label>
+    <input type="text" name="address" required><br><br>
+    <button type="submit">إضافة</button>
+  </form>
+  <h2>عرض البيانات</h2>
+  <button onclick="fetchData()">عرض البيانات</button>
+  <div id="data"></div>
 
-    <script>
-        const form = document.getElementById('checkForm');
-        const result = document.getElementById('result');
-
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const word = document.getElementById('word').value;
-
-            try {
-                const response = await fetch('/verify', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ word })
-                });
-
-                if (!response.ok) {
-                    throw new Error('استجابة غير صحيحة من الخادم');
-                }
-
-                const data = await response.json();
-                if (data.valid) {
-                    result.textContent = 'الكلمة صحيحة!';
-                    result.style.color = 'green';
-                } else {
-                    result.textContent = 'الكلمة غير صحيحة!';
-                    result.style.color = 'red';
-                }
-            } catch (error) {
-                result.textContent = `حدث خطأ: ${error.message}`;
-                result.style.color = 'red';
-            }
-        });
-    </script>
+  <script>
+    async function fetchData() {
+      const response = await fetch("/data");
+      const data = await response.json();
+      const dataDiv = document.getElementById("data");
+      dataDiv.innerHTML = JSON.stringify(data, null, 2);
+    }
+  </script>
 </body>
 </html>

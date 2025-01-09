@@ -1,12 +1,15 @@
 {
-  "name": "word-checker",
+  "name": "render-database-app",
   "version": "1.0.0",
-  "description": "A simple word verification app",
+  "description": "مشروع بسيط للتعامل مع قاعدة بيانات Render باستخدام Node.js",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "pg": "^8.10.0"
   }
 }

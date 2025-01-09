@@ -1,38 +1,56 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
+const express = require("express");
+const bodyParser = require("body-parser");
+const { Pool } = require("pg");
+require("dotenv").config();
+
 const app = express();
-
-// استخدم JSON لتفسير البيانات المدخلة
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// قراءة البيانات السرية من ملف .env أو Secret File
-const secretFilePath = '/etc/secrets/file.txt'; // قم بتغيير المسار حسب الحاجة
-let secretData = '';
-
-// قراءة الملف عند بدء الخادم
-fs.readFile(secretFilePath, 'utf8', (err, data) => {
-  if (err) {
-    console.error('خطأ في قراءة الملف السرية:', err);
-  } else {
-    secretData = data.trim();  // احفظ البيانات السرية
-  }
-});
-
-// نقطة النهاية للمقارنة
-app.post('/compare', (req, res) => {
-  const inputData = req.body.input;  // استلام المدخل من المستخدم
-
-  if (inputData === secretData) {
-    res.json({ message: 'البيانات متطابقة' });
-  } else {
-    res.json({ message: 'البيانات غير متطابقة' });
-  }
-});
-
-// بدء الخادم
 const port = process.env.PORT || 3000;
+
+// إعداد قاعدة البيانات
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // هام عند استخدام PostgreSQL على Render
+  },
+});
+
+// إعدادات التطبيق
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("views"));
+
+// عرض الصفحة الرئيسية
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/views/index.html");
+});
+
+// إضافة بيانات جديدة
+app.post("/add", async (req, res) => {
+  const { firstName, lastName, address } = req.body;
+
+  try {
+    await pool.query(
+      "INSERT INTO users (first_name, last_name, address) VALUES ($1, $2, $3)",
+      [firstName, lastName, address]
+    );
+    res.send("تمت إضافة البيانات بنجاح!");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("حدث خطأ أثناء إضافة البيانات.");
+  }
+});
+
+// عرض البيانات
+app.get("/data", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM users");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("حدث خطأ أثناء عرض البيانات.");
+  }
+});
+
 app.listen(port, () => {
   console.log(`الخادم يعمل على المنفذ ${port}`);
 });

@@ -42,16 +42,26 @@ async function updateSheetData(data) {
 // إعداد Express للتعامل مع الطلبات
 app.use(express.json()); // للتعامل مع البيانات التي يتم إرسالها بتنسيق JSON
 
-// نقطة النهاية لاستقبال بيانات الـ POST
+// نقطة النهاية لاستقبال بيانات الـ POST// نقطة النهاية لاستقبال بيانات الـ POST
 app.post('/update', async (req, res) => {
   try {
     const data = req.body; // بيانات الـ POST المرسلة من الـ HTML
+    console.log('Received data:', data); // لتسجيل البيانات المستلمة
+
+    // التحقق من البيانات المرسلة
+    if (!data.id || !data.sellAd || !data.buyAd || !data.withAd || !data.lstUpdt) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
     const updatedData = await updateSheetData(data); // تحديث البيانات في Google Sheets
     res.status(200).json({ message: 'Data updated successfully', data: updatedData });
   } catch (error) {
+    console.error('Error during update:', error); // تسجيل التفاصيل حول الخطأ
     res.status(500).json({ error: 'Failed to update data', details: error.message });
   }
 });
+
+
 
 // تشغيل الخادم على رابط Render
 app.listen(PORT, () => {

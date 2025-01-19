@@ -114,22 +114,6 @@ app.get('/row', async (req, res) => {
 });
 
 // نقطة النهاية لتحديث البيانات باستخدام POST
-app.post('/update', async (req, res) => {
-  try {
-    const data = req.body; // البيانات المرسلة من الـ HTML عبر POST
-    console.log('Received data:', data);
-
-    if (!data.id || !data.sellAd || !data.buyAd || !data.withAd || !data.lstUpdt) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    const updatedData = await updateSheetData(data); // تحديث البيانات في Google Sheets
-    res.status(200).json({ message: 'Data updated successfully', data: updatedData });
-  } catch (error) {
-    console.error('Error during update:', error); // تسجيل التفاصيل حول الخطأ
-    res.status(500).json({ error: 'Failed to update data', details: error.message });
-  }
-});
 
 // تشغيل الخادم على رابط Render
 app.listen(PORT, () => {

@@ -14,7 +14,7 @@ const corsOptions = {
 app.use(cors(corsOptions)); // استخدام إعدادات CORS المخصصة
 
 // إعداد Google Sheets API
-async function updateSheetData(data) {
+async function getSheetData() {
   const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com'; // بريد حساب الخدمة
   const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n'); // استبدال \n بالسطر الجديد
   const spreadsheetId = '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10'; // معرف Google Sheets
@@ -24,27 +24,21 @@ async function updateSheetData(data) {
       client_email: clientEmail,
       private_key: privateKey,
     },
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'], // إذن الكتابة
+    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'], // إذن القراءة فقط
   });
 
   const client = await auth.getClient();
   const sheets = google.sheets({ version: 'v4', auth: client });
 
   try {
-    // تحديد البيانات التي سيتم تحديثها في الصف الأول (مثال: row[0] و row[4])
-    const response = await sheets.spreadsheets.values.update({
+    // قراءة البيانات من ورقة Usdt1 من A إلى E
+    const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: 'Usdt1!A:E', // تحديث الخلايا من A1 إلى E1 في ورقة Usdt1
-      valueInputOption: 'RAW', // لإدخال البيانات مباشرة
-      resource: {
-        values: [
-          [data.id, data.sellAd, data.buyAd, data.withAd, data.lstUpdt], // البيانات التي سيتم إدخالها
-        ],
-      },
+      range: 'Usdt1!A:E', // النطاق الذي سيتم قراءته
     });
-    return response.data;
+    return response.data.values; // إرجاع القيم المقروءة
   } catch (error) {
-    console.error('Error updating sheet:', error);
+    console.error('Error reading sheet:', error);
     throw error;
   }
 }
@@ -52,22 +46,17 @@ async function updateSheetData(data) {
 // إعداد Express للتعامل مع الطلبات
 app.use(express.json()); // للتعامل مع البيانات التي يتم إرسالها بتنسيق JSON
 
-// نقطة النهاية لاستقبال بيانات الـ POST
-app.post('/update', async (req, res) => {
+// نقطة النهاية لقراءة البيانات من الشيت باستخدام GET
+app.get('/row', async (req, res) => {
   try {
-    const data = req.body; // بيانات الـ POST المرسلة من الـ HTML
-    console.log('Received data:', data); // لتسجيل البيانات المستلمة
-
-    // التحقق من البيانات المرسلة
-    if (!data.id || !data.sellAd || !data.buyAd || !data.withAd || !data.lstUpdt) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    const rows = await getSheetData(); // قراءة البيانات من Google Sheets
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ message: 'No data found in the sheet' });
     }
-
-    const updatedData = await updateSheetData(data); // تحديث البيانات في Google Sheets
-    res.status(200).json({ message: 'Data updated successfully', data: updatedData });
+    res.status(200).json({ data: rows }); // إرسال البيانات في الرد
   } catch (error) {
-    console.error('Error during update:', error); // تسجيل التفاصيل حول الخطأ
-    res.status(500).json({ error: 'Failed to update data', details: error.message });
+    console.error('Error during reading data:', error); // تسجيل التفاصيل حول الخطأ
+    res.status(500).json({ error: 'Failed to read data', details: error.message });
   }
 });
 

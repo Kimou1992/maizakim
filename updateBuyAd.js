@@ -1,14 +1,23 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // إرسال البيانات لتحديث Buy Ad باستخدام POST
-  document.getElementById('update-buyad-form').addEventListener('submit', async function (event) {
-    event.preventDefault();
+// وظيفة لإرسال البيانات باستخدام POST لتحديث البيانات في Google Sheets بناءً على id
+async function updateDataById(event) {
+  event.preventDefault();
 
-    const data = {
-      id: document.getElementById('id-update').value,
-      buyAd: document.getElementById('buyAd-update').value,
-    };
+  const data = {
+    id: document.getElementById('id').value,
+    sellAd: document.getElementById('sellAd').value,
+    buyAd: document.getElementById('buyAd').value,
+    withAd: document.getElementById('withAd').value,
+    lstUpdt: document.getElementById('lstUpdt').value,
+  };
 
-    const response = await fetch('https://maizakim.onrender.com/update-buyad', {
+  // التأكد من أن البيانات تحتوي على id
+  if (!data.id) {
+    alert('Please enter a valid ID!');
+    return;
+  }
+
+  try {
+    const response = await fetch('https://maizakim.onrender.com/update', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -17,32 +26,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const result = await response.json();
-    console.log(result);
 
     if (response.ok) {
-      alert('Buy Ad updated successfully!');
-      fetchData(); // إعادة تحميل البيانات بعد التحديث
+      alert('Data updated successfully!');
+      // يمكنك هنا تنفيذ دالة أخرى لعرض البيانات المحدثة
+      // fetchData(); // إعادة تحميل البيانات إذا لزم الأمر
     } else {
       alert('Error: ' + result.error);
     }
-  });
-});
-
-// جلب البيانات عند تحميل الصفحة
-async function fetchData() {
-  const response = await fetch('https://maizakim.onrender.com/row');
-  const data = await response.json();
-  
-  const tableBody = document.querySelector('#data-table tbody');
-  tableBody.innerHTML = ''; // مسح الجدول الحالي
-
-  data.data.forEach(row => {
-    const rowElement = document.createElement('tr');
-    row.forEach(cell => {
-      const cellElement = document.createElement('td');
-      cellElement.textContent = cell;
-      rowElement.appendChild(cellElement);
-    });
-    tableBody.appendChild(rowElement);
-  });
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
 }
+
+// إضافة مستمع الحدث للنموذج
+document.getElementById('update-form').addEventListener('submit', updateDataById);

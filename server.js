@@ -7,7 +7,8 @@ const PORT = 3000;
 // إعداد Google Sheets API
 async function getSheetData() {
   const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com'; // بريد حساب الخدمة
-  const privateKey = process.env.PRIVATE_KEY; // المفتاح الخاص من متغير البيئة
+  const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n'); // استبدال \n بالسطر الجديد
+ // المفتاح الخاص من متغير البيئة
   const spreadsheetId = '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10'; // معرف Google Sheets
 
   const auth = new google.auth.GoogleAuth({

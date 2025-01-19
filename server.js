@@ -61,35 +61,18 @@ async function updateSheetData(data) {
   const sheets = google.sheets({ version: 'v4', auth: client });
 
   try {
-    // قراءة البيانات لتحديد الصف المطلوب بناءً على `id`
-    const readResponse = await sheets.spreadsheets.values.get({
+    // تحديث البيانات في الصف المحدد (في المثال هذا، الصف 1)
+    const response = await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: 'Usdt1!A:E', // قراءة كامل العمود الذي يحتوي على البيانات
-    });
-
-    const rows = readResponse.data.values;
-    if (!rows || rows.length === 0) {
-      throw new Error('Sheet is empty or does not exist.');
-    }
-
-    // البحث عن الصف الذي يحتوي على `id`
-    const rowIndex = rows.findIndex(row => row[0] === data.id);
-    if (rowIndex === -1) {
-      throw new Error(`No row found with ID: ${data.id}`);
-    }
-
-    // تحديد النطاق بناءً على الصف الذي يحتوي على `id`
-    const updateRange = `Usdt1!A${rowIndex + 1}:E${rowIndex + 1}`;
-    const updateResponse = await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: updateRange,
+      range: 'Usdt1!A:E', // النطاق الذي سيتم تحديثه
       valueInputOption: 'RAW',
       resource: {
-        values: [[data.id, data.sellAd, data.buyAd, data.withAd, data.lstUpdt]],
+        values: [
+          [data.id, data.sellAd, data.buyAd, data.withAd, data.lstUpdt], // القيم التي سيتم تحديثها
+        ],
       },
     });
-
-    return updateResponse.data;
+    return response.data;
   } catch (error) {
     console.error('Error updating sheet:', error);
     throw error;
@@ -114,9 +97,26 @@ app.get('/row', async (req, res) => {
 });
 
 // نقطة النهاية لتحديث البيانات باستخدام POST
+app.post('/update', async (req, res) => {
+  try {
+    const data = req.body; // البيانات المرسلة من الـ HTML عبر POST
+    console.log('Received data:', data);
+
+    if (!data.id || !data.sellAd || !data.buyAd || !data.withAd || !data.lstUpdt) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const updatedData = await updateSheetData(data); // تحديث البيانات في Google Sheets
+    res.status(200).json({ message: 'Data updated successfully', data: updatedData });
+  } catch (error) {
+    console.error('Error during update:', error); // تسجيل التفاصيل حول الخطأ
+    res.status(500).json({ error: 'Failed to update data', details: error.message });
+  }
+});
 
 // تشغيل الخادم على رابط Render
 app.listen(PORT, () => {
   console.log(`Server is running on https://your-app-name.onrender.com`);
 });
-         
+
+  

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Sheets API - GET and POST</title>
+</head>
+<body>
+
+  <h1>Google Sheets Data</h1>
+
+  <!-- عرض البيانات باستخدام GET -->
+  <table id="data-table" border="1">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Sell Ad</th>
+        <th>Buy Ad</th>
+        <th>With Ad</th>
+        <th>Last Updated</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>Update Google Sheets</h2>
+  <!-- نموذج لإرسال البيانات باستخدام POST -->
+  <form id="update-form">
+    <label for="id">ID:</label><br>
+    <input type="text" id="id" name="id" required><br><br>
+
+    <label for="sellAd">Sell Ad:</label><br>
+    <input type="text" id="sellAd" name="sellAd" required><br><br>
+
+    <label for="buyAd">Buy Ad:</label><br>
+    <input type="text" id="buyAd" name="buyAd" required><br><br>
+
+    <label for="withAd">With Ad:</label><br>
+    <input type="text" id="withAd" name="withAd" required><br><br>
+
+    <label for="lstUpdt">Last Updated:</label><br>
+    <input type="text" id="lstUpdt" name="lstUpdt" required><br><br>
+
+    <button type="submit">Update</button>
+  </form>
+
+  <h2>Update Buy Ad based on ID</h2>
+  <!-- نموذج لتحديث Buy Ad بناءً على ID -->
+  <form id="update-buyad-form">
+    <label for="id-update">ID:</label><br>
+    <input type="text" id="id-update" name="id-update" required><br><br>
+
+    <label for="buyAd-update">Buy Ad:</label><br>
+    <input type="text" id="buyAd-update" name="buyAd-update" required><br><br>
+
+    <button type="submit">Update Buy Ad</button>
+  </form>
+
+  <script src="updateBuyAd.js"></script> <!-- تضمين ملف JavaScript الجديد -->
+</body>
+</html>

@@ -61,18 +61,35 @@ async function updateSheetData(data) {
   const sheets = google.sheets({ version: 'v4', auth: client });
 
   try {
-    // تحديث البيانات في الصف المحدد (في المثال هذا، الصف 1)
-    const response = await sheets.spreadsheets.values.update({
+    // قراءة البيانات لتحديد الصف المطلوب بناءً على `id`
+    const readResponse = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: 'Usdt1!A:E', // النطاق الذي سيتم تحديثه
+      range: 'Usdt1!A:E', // قراءة كامل العمود الذي يحتوي على البيانات
+    });
+
+    const rows = readResponse.data.values;
+    if (!rows || rows.length === 0) {
+      throw new Error('Sheet is empty or does not exist.');
+    }
+
+    // البحث عن الصف الذي يحتوي على `id`
+    const rowIndex = rows.findIndex(row => row[0] === data.id);
+    if (rowIndex === -1) {
+      throw new Error(`No row found with ID: ${data.id}`);
+    }
+
+    // تحديد النطاق بناءً على الصف الذي يحتوي على `id`
+    const updateRange = `Usdt1!A${rowIndex + 1}:E${rowIndex + 1}`;
+    const updateResponse = await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: updateRange,
       valueInputOption: 'RAW',
       resource: {
-        values: [
-          [data.id, data.sellAd, data.buyAd, data.withAd, data.lstUpdt], // القيم التي سيتم تحديثها
-        ],
+        values: [[data.id, data.sellAd, data.buyAd, data.withAd, data.lstUpdt]],
       },
     });
-    return response.data;
+
+    return updateResponse.data;
   } catch (error) {
     console.error('Error updating sheet:', error);
     throw error;
@@ -118,4 +135,4 @@ app.post('/update', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on https://your-app-name.onrender.com`);
 });
-      
+         

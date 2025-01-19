@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Sheets Row</title>
+  <script>
+    async function fetchRow() {
+      try {
+        const response = await fetch('https://<YOUR_RENDER_SERVICE_URL>/row'); // رابط الخادم
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const data = await response.json();
+        const row = data.row;
+
+        // عرض البيانات في الصفحة
+        const rowContainer = document.getElementById('row-data');
+        rowContainer.innerHTML = row.map(cell => `<li>${cell}</li>`).join('');
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to fetch row data!');
+      }
+    }
+  </script>
+</head>
+<body onload="fetchRow()">
+  <h1>Contents of the First Row (Usdt1)</h1>
+  <ul id="row-data">
+    <!-- البيانات ستُعرض هنا -->
+  </ul>
+</body>
+</html>

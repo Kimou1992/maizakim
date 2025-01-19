@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Sheets API - Data Management</title>
+  <title>Google Sheets API - GET and POST</title>
 </head>
 <body>
 
-  <h1>Google Sheets Data Management</h1>
+  <h1>Google Sheets Data</h1>
 
   <!-- عرض البيانات باستخدام GET -->
-  <h2>Current Data</h2>
   <table id="data-table" border="1">
     <thead>
       <tr>
@@ -24,54 +23,31 @@
     <tbody></tbody>
   </table>
 
-  <!-- إضافة بيانات جديدة -->
-  <h2>Add New Data</h2>
-  <form id="add-form">
-    <label for="add-id">ID:</label><br>
-    <input type="text" id="add-id" name="id" required><br><br>
-
-    <label for="add-sellAd">Sell Ad:</label><br>
-    <input type="text" id="add-sellAd" name="sellAd" required><br><br>
-
-    <label for="add-buyAd">Buy Ad:</label><br>
-    <input type="text" id="add-buyAd" name="buyAd" required><br><br>
-
-    <label for="add-withAd">With Ad:</label><br>
-    <input type="text" id="add-withAd" name="withAd" required><br><br>
-
-    <label for="add-lstUpdt">Last Updated:</label><br>
-    <input type="text" id="add-lstUpdt" name="lstUpdt" required><br><br>
-
-    <button type="submit">Add Data</button>
-  </form>
-
-  <!-- تعديل بيانات موجودة -->
-  <h2>Update Data</h2>
+  <h2>Update Google Sheets</h2>
+  <!-- نموذج لإرسال البيانات باستخدام POST -->
   <form id="update-form">
-    <label for="update-id">ID:</label><br>
-    <input type="text" id="update-id" name="id" required><br><br>
+    <label for="id">ID:</label><br>
+    <input type="text" id="id" name="id" required><br><br>
 
-    <label for="update-sellAd">Sell Ad:</label><br>
-    <input type="text" id="update-sellAd" name="sellAd" required><br><br>
+    <label for="sellAd">Sell Ad:</label><br>
+    <input type="text" id="sellAd" name="sellAd" required><br><br>
 
-    <label for="update-buyAd">Buy Ad:</label><br>
-    <input type="text" id="update-buyAd" name="buyAd" required><br><br>
+    <label for="buyAd">Buy Ad:</label><br>
+    <input type="text" id="buyAd" name="buyAd" required><br><br>
 
-    <label for="update-withAd">With Ad:</label><br>
-    <input type="text" id="update-withAd" name="withAd" required><br><br>
+    <label for="withAd">With Ad:</label><br>
+    <input type="text" id="withAd" name="withAd" required><br><br>
 
-    <label for="update-lstUpdt">Last Updated:</label><br>
-    <input type="text" id="update-lstUpdt" name="lstUpdt" required><br><br>
+    <label for="lstUpdt">Last Updated:</label><br>
+    <input type="text" id="lstUpdt" name="lstUpdt" required><br><br>
 
-    <button type="submit">Update Data</button>
+    <button type="submit">Update</button>
   </form>
 
   <script>
-    const apiBase = 'https://maizakim.onrender.com'; // ضع هنا رابط الخادم
-
-    // جلب البيانات باستخدام GET
+    // الحصول على البيانات باستخدام GET
     async function fetchData() {
-      const response = await fetch(`${apiBase}/row`);
+      const response = await fetch('https://maizakim.onrender.com/row');
       const data = await response.json();
       
       const tableBody = document.querySelector('#data-table tbody');
@@ -88,49 +64,19 @@
       });
     }
 
-    // إضافة بيانات جديدة باستخدام POST
-    document.getElementById('add-form').addEventListener('submit', async function (event) {
-      event.preventDefault();
-
-      const data = {
-        id: document.getElementById('add-id').value,
-        sellAd: document.getElementById('add-sellAd').value,
-        buyAd: document.getElementById('add-buyAd').value,
-        withAd: document.getElementById('add-withAd').value,
-        lstUpdt: document.getElementById('add-lstUpdt').value,
-      };
-
-      const response = await fetch(`${apiBase}/update`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-      console.log(result);
-      if (response.ok) {
-        alert('Data added successfully!');
-        fetchData(); // إعادة تحميل البيانات
-      } else {
-        alert('Error: ' + result.error);
-      }
-    });
-
-    // تعديل بيانات موجودة باستخدام POST
+    // إرسال البيانات باستخدام POST
     document.getElementById('update-form').addEventListener('submit', async function (event) {
       event.preventDefault();
 
       const data = {
-        id: document.getElementById('update-id').value,
-        sellAd: document.getElementById('update-sellAd').value,
-        buyAd: document.getElementById('update-buyAd').value,
-        withAd: document.getElementById('update-withAd').value,
-        lstUpdt: document.getElementById('update-lstUpdt').value,
+        id: document.getElementById('id').value,
+        sellAd: document.getElementById('sellAd').value,
+        buyAd: document.getElementById('buyAd').value,
+        withAd: document.getElementById('withAd').value,
+        lstUpdt: document.getElementById('lstUpdt').value,
       };
 
-      const response = await fetch(`${apiBase}/update`, {
+      const response = await fetch('https://maizakim.onrender.com/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -142,7 +88,7 @@
       console.log(result);
       if (response.ok) {
         alert('Data updated successfully!');
-        fetchData(); // إعادة تحميل البيانات
+        fetchData(); // إعادة تحميل البيانات بعد التحديث
       } else {
         alert('Error: ' + result.error);
       }

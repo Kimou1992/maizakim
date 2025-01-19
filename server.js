@@ -1,11 +1,10 @@
 const express = require('express');
 const { google } = require('googleapis');
-
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // استخدام المتغير البيئي PORT في حالة نشره على Render
 
 // إعداد Google Sheets API
-async function getSheetData() {
+async function updateSheetData(data) {
   const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com'; // بريد حساب الخدمة
   const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n'); // استبدال \n بالسطر الجديد
   const spreadsheetId = '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10'; // معرف Google Sheets
@@ -15,71 +14,46 @@ async function getSheetData() {
       client_email: clientEmail,
       private_key: privateKey,
     },
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'], // إذن القراءة والكتابة
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'], // إذن الكتابة
   });
 
   const client = await auth.getClient();
   const sheets = google.sheets({ version: 'v4', auth: client });
 
   try {
-    // قراءة الصف الأول من ورقة Usdt1
-    const response = await sheets.spreadsheets.values.get({
+    // تحديد البيانات التي سيتم تحديثها في الصف الأول (مثال: row[0] و row[4])
+    const response = await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: 'Usdt1!1:1', // استرجاع الصف الأول من ورقة Usdt1
+      range: 'Usdt1!A1:E1', // تحديث الخلايا من A1 إلى E1 في ورقة Usdt1
+      valueInputOption: 'RAW', // لإدخال البيانات مباشرة
+      resource: {
+        values: [
+          [data.id, data.sellAd, data.buyAd, data.withAd, data.lstUpdt], // البيانات التي سيتم إدخالها
+        ],
+      },
     });
-    return response.data.values[0]; // الصف الأول
+    return response.data;
   } catch (error) {
-    console.error('Error reading sheet:', error);
+    console.error('Error updating sheet:', error);
     throw error;
   }
 }
 
-// نقطة النهاية لاسترجاع الصف الأول من ورقة Usdt1
-app.get('/row', async (req, res) => {
+// إعداد Express للتعامل مع الطلبات
+app.use(express.json()); // للتعامل مع البيانات التي يتم إرسالها بتنسيق JSON
+
+// نقطة النهاية لاستقبال بيانات الـ POST
+app.post('/update', async (req, res) => {
   try {
-    const row = await getSheetData();
-    res.status(200).json({ row });
+    const data = req.body; // بيانات الـ POST المرسلة من الـ HTML
+    const updatedData = await updateSheetData(data); // تحديث البيانات في Google Sheets
+    res.status(200).json({ message: 'Data updated successfully', data: updatedData });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch data', details: error.message });
+    res.status(500).json({ error: 'Failed to update data', details: error.message });
   }
 });
 
-// نقطة النهاية لتحديث البيانات أو إضافة بيانات جديدة
-app.post('/update', express.json(), async (req, res) => {
-  const { id, sellAd, buyAd, withAd, lstUpdt } = req.body;
-
-  const newData = [id, sellAd, buyAd, withAd, lstUpdt];
-
-  try {
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email: 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com',
-        private_key: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
-      },
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
-
-    const client = await auth.getClient();
-    const sheets = google.sheets({ version: 'v4', auth: client });
-
-    // إضافة البيانات الجديدة إلى الورقة (Usdt1)
-    const response = await sheets.spreadsheets.values.append({
-      spreadsheetId: '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10',
-      range: 'Usdt1!A2:E2', // تحديد نطاق الإضافة
-      valueInputOption: 'RAW',
-      resource: {
-        values: [newData]
-      },
-    });
-
-    res.status(200).json({ message: 'Data added successfully!', data: newData });
-  } catch (error) {
-    console.error('Error updating sheet:', error);
-    res.status(500).json({ error: 'Failed to add data', details: error.message });
-  }
-});
-
-// تشغيل الخادم
+// تشغيل الخادم على رابط Render
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on https://your-app-name.onrender.com`);
 });

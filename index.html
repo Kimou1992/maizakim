@@ -3,31 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Sheets Row</title>
-  <script>
-    async function fetchRow() {
-      try {
-        const response = await fetch('https://<YOUR_RENDER_SERVICE_URL>/row'); // رابط الخادم
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        const data = await response.json();
-        const row = data.row;
-
-        // عرض البيانات في الصفحة
-        const rowContainer = document.getElementById('row-data');
-        rowContainer.innerHTML = row.map(cell => `<li>${cell}</li>`).join('');
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to fetch row data!');
-      }
-    }
-  </script>
+  <title>Google Sheets Data</title>
 </head>
-<body onload="fetchRow()">
-  <h1>Contents of the First Row (Usdt1)</h1>
-  <ul id="row-data">
-    <!-- البيانات ستُعرض هنا -->
-  </ul>
+<body>
+  <h1>Google Sheets Data</h1>
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>SellAd</th>
+        <th>BuyAd</th>
+        <th>WithAd</th>
+        <th>LstUpdt</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- البيانات ستظهر هنا -->
+    </tbody>
+  </table>
+
+  <script>
+    // جلب البيانات من الخادم
+    fetch('https://maizakim.onrender.com/row')
+      .then(response => response.json())  // تحويل الاستجابة إلى JSON
+      .then(data => {
+        // التأكد من أن البيانات موجودة
+        if (data.row && data.row.length > 0) {
+          // اختيار الـ tbody لإضافة الصفوف
+          const tableBody = document.querySelector('#dataTable tbody');
+          // إضافة البيانات إلى الجدول
+          const row = data.row;
+          const newRow = document.createElement('tr');
+          newRow.innerHTML = `
+            <td>${row[0]}</td>
+            <td>${row[1]}</td>
+            <td>${row[2]}</td>
+            <td>${row[3]}</td>
+            <td>${row[4]}</td>
+          `;
+          tableBody.appendChild(newRow);
+        } else {
+          console.error('No data received');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  </script>
 </body>
 </html>

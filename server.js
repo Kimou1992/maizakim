@@ -1,56 +1,71 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const { Pool } = require("pg");
-require("dotenv").config();
+const express = require('express');
+const { google } = require('googleapis');
 
+// إنشاء تطبيق Express
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = 3000; // المنفذ الذي سيعمل عليه الخادم
 
-// إعداد قاعدة البيانات
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // هام عند استخدام PostgreSQL على Render
-  },
-});
+// Middleware لتحليل بيانات JSON
+app.use(express.json());
 
-// إعدادات التطبيق
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static("views"));
+// إعداد Google Sheets API
+async function updateSheet(data) {
+  // بيانات Google Service Account
+  const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com'; // بريد حساب الخدمة
+  const privateKey = process.env.PRIVATE_KEY; // المفتاح الخاص من متغير البيئة
+  const spreadsheetId = '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10'; // معرف Google Sheets
 
-// عرض الصفحة الرئيسية
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/views/index.html");
-});
+  // إعداد المصادقة
+  const auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: clientEmail,
+      private_key: privateKey,
+    },
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  });
 
-// إضافة بيانات جديدة
-app.post("/add", async (req, res) => {
-  const { firstName, lastName, address } = req.body;
+  // الحصول على عميل مصدّق
+  const client = await auth.getClient();
+
+  // إعداد طلب التحديث
+  const sheets = google.sheets({ version: 'v4', auth: client });
+  const request = {
+    spreadsheetId,
+    range: 'Sheet1!A1', // النطاق المراد تحديثه
+    valueInputOption: 'RAW',
+    resource: {
+      values: [
+        [data], // البيانات القادمة من الطلب
+      ],
+    },
+  };
 
   try {
-    await pool.query(
-      "INSERT INTO users (first_name, last_name, address) VALUES ($1, $2, $3)",
-      [firstName, lastName, address]
-    );
-    res.send("تمت إضافة البيانات بنجاح!");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("حدث خطأ أثناء إضافة البيانات.");
+    const response = await sheets.spreadsheets.values.update(request);
+    console.log('Data updated:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating sheet:', error);
+    throw error;
+  }
+}
+
+// نقطة النهاية لتلقي طلب POST
+app.post('/update', async (req, res) => {
+  const { data } = req.body; // الحصول على البيانات من الطلب
+  if (!data) {
+    return res.status(400).json({ error: 'No data provided' });
+  }
+
+  try {
+    await updateSheet(data);
+    res.status(200).json({ message: 'Data updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update data', details: error.message });
   }
 });
 
-// عرض البيانات
-app.get("/data", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM users");
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("حدث خطأ أثناء عرض البيانات.");
-  }
-});
-
-app.listen(port, () => {
-  console.log(`الخادم يعمل على المنفذ ${port}`);
+// تشغيل الخادم
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

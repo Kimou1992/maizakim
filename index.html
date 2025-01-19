@@ -1,54 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Sheets Data</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Data Editor</title>
 </head>
 <body>
-  <h1>Google Sheets Data</h1>
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>SellAd</th>
-        <th>BuyAd</th>
-        <th>WithAd</th>
-        <th>LstUpdt</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- البيانات ستظهر هنا -->
-    </tbody>
-  </table>
+    <h1>Edit Google Sheets Data</h1>
+    
+    <form id="updateForm">
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id" required>
+        <br><br>
+        
+        <label for="sellAd">Sell Ad:</label>
+        <input type="text" id="sellAd" name="sellAd" required>
+        <br><br>
 
-  <script>
-    // جلب البيانات من الخادم
-    fetch('https://maizakim.onrender.com/row')
-      .then(response => response.json())  // تحويل الاستجابة إلى JSON
-      .then(data => {
-        // التأكد من أن البيانات موجودة
-        if (data.row && data.row.length > 0) {
-          // اختيار الـ tbody لإضافة الصفوف
-          const tableBody = document.querySelector('#dataTable tbody');
-          // إضافة البيانات إلى الجدول
-          const row = data.row;
-          const newRow = document.createElement('tr');
-          newRow.innerHTML = `
-            <td>${row[0]}</td>
-            <td>${row[1]}</td>
-            <td>${row[2]}</td>
-            <td>${row[3]}</td>
-            <td>${row[4]}</td>
-          `;
-          tableBody.appendChild(newRow);
-        } else {
-          console.error('No data received');
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  </script>
+        <label for="buyAd">Buy Ad:</label>
+        <input type="text" id="buyAd" name="buyAd" required>
+        <br><br>
+
+        <label for="withAd">With Ad:</label>
+        <input type="text" id="withAd" name="withAd" required>
+        <br><br>
+
+        <label for="lstUpdt">Last Update:</label>
+        <input type="text" id="lstUpdt" name="lstUpdt" required>
+        <br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById('updateForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // منع الإرسال الافتراضي للنموذج
+            
+            // استخراج البيانات من الحقول
+            const id = document.getElementById('id').value;
+            const sellAd = document.getElementById('sellAd').value;
+            const buyAd = document.getElementById('buyAd').value;
+            const withAd = document.getElementById('withAd').value;
+            const lstUpdt = document.getElementById('lstUpdt').value;
+
+            // بناء الجسم الذي سيتم إرساله
+            const data = {
+                id: id,
+                sellAd: sellAd,
+                buyAd: buyAd,
+                withAd: withAd,
+                lstUpdt: lstUpdt
+            };
+
+            // إرسال الطلب إلى الخادم على Render
+            fetch('https://your-app-name.onrender.com/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data) // إرسال البيانات في الجسم
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                alert('Data updated successfully!');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Failed to update data');
+            });
+        });
+    </script>
 </body>
 </html>

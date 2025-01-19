@@ -4,6 +4,15 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000; // استخدام المتغير البيئي PORT في حالة نشره على Render
 
+// إعداد CORS
+const corsOptions = {
+  origin: '*', // يسمح بالوصول من أي نطاق
+  methods: ['GET', 'POST'], // تحديد طرق HTTP المسموح بها
+  allowedHeaders: ['Content-Type'], // السماح بالوصول للرؤوس المحددة
+};
+
+app.use(cors(corsOptions)); // استخدام إعدادات CORS المخصصة
+
 // إعداد Google Sheets API
 async function updateSheetData(data) {
   const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com'; // بريد حساب الخدمة
@@ -41,7 +50,6 @@ async function updateSheetData(data) {
 }
 
 // إعداد Express للتعامل مع الطلبات
-app.use(cors()); // يسمح بالوصول من أي نطاق
 app.use(express.json()); // للتعامل مع البيانات التي يتم إرسالها بتنسيق JSON
 
 // نقطة النهاية لاستقبال بيانات الـ POST

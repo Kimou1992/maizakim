@@ -8,7 +8,6 @@ const PORT = 3000;
 async function getSheetData() {
   const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com'; // بريد حساب الخدمة
   const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n'); // استبدال \n بالسطر الجديد
- // المفتاح الخاص من متغير البيئة
   const spreadsheetId = '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10'; // معرف Google Sheets
 
   const auth = new google.auth.GoogleAuth({
@@ -16,7 +15,7 @@ async function getSheetData() {
       client_email: clientEmail,
       private_key: privateKey,
     },
-    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'], // إذن القراءة فقط
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'], // إذن القراءة والكتابة
   });
 
   const client = await auth.getClient();
@@ -42,6 +41,41 @@ app.get('/row', async (req, res) => {
     res.status(200).json({ row });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch data', details: error.message });
+  }
+});
+
+// نقطة النهاية لتحديث البيانات أو إضافة بيانات جديدة
+app.post('/update', express.json(), async (req, res) => {
+  const { id, sellAd, buyAd, withAd, lstUpdt } = req.body;
+
+  const newData = [id, sellAd, buyAd, withAd, lstUpdt];
+
+  try {
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com',
+        private_key: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const client = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: client });
+
+    // إضافة البيانات الجديدة إلى الورقة (Usdt1)
+    const response = await sheets.spreadsheets.values.append({
+      spreadsheetId: '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10',
+      range: 'Usdt1!A2:E2', // تحديد نطاق الإضافة
+      valueInputOption: 'RAW',
+      resource: {
+        values: [newData]
+      },
+    });
+
+    res.status(200).json({ message: 'Data added successfully!', data: newData });
+  } catch (error) {
+    console.error('Error updating sheet:', error);
+    res.status(500).json({ error: 'Failed to add data', details: error.message });
   }
 });
 

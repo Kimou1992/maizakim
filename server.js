@@ -24,7 +24,7 @@ async function updateSheetData(data) {
     // تحديد البيانات التي سيتم تحديثها في الصف الأول (مثال: row[0] و row[4])
     const response = await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: 'Usdt1!A:H', // تحديث الخلايا من A1 إلى E1 في ورقة Usdt1
+      range: 'Usdt1!A1:E1', // تحديث الخلايا من A1 إلى E1 في ورقة Usdt1
       valueInputOption: 'RAW', // لإدخال البيانات مباشرة
       resource: {
         values: [
@@ -42,7 +42,7 @@ async function updateSheetData(data) {
 // إعداد Express للتعامل مع الطلبات
 app.use(express.json()); // للتعامل مع البيانات التي يتم إرسالها بتنسيق JSON
 
-// نقطة النهاية لاستقبال بيانات الـ POST// نقطة النهاية لاستقبال بيانات الـ POST
+// نقطة النهاية لاستقبال بيانات الـ POST
 app.post('/update', async (req, res) => {
   try {
     const data = req.body; // بيانات الـ POST المرسلة من الـ HTML
@@ -60,8 +60,6 @@ app.post('/update', async (req, res) => {
     res.status(500).json({ error: 'Failed to update data', details: error.message });
   }
 });
-
-
 
 // تشغيل الخادم على رابط Render
 app.listen(PORT, () => {

@@ -1,5 +1,6 @@
 const express = require('express');
 const { google } = require('googleapis');
+const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000; // استخدام المتغير البيئي PORT في حالة نشره على Render
 
@@ -40,6 +41,7 @@ async function updateSheetData(data) {
 }
 
 // إعداد Express للتعامل مع الطلبات
+app.use(cors()); // يسمح بالوصول من أي نطاق
 app.use(express.json()); // للتعامل مع البيانات التي يتم إرسالها بتنسيق JSON
 
 // نقطة النهاية لاستقبال بيانات الـ POST

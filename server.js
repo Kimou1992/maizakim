@@ -2,156 +2,112 @@ const express = require('express');
 const { google } = require('googleapis');
 const cors = require('cors');
 const app = express();
-const PORT = process.env.PORT || 3000; // استخدام المتغير البيئي PORT في حالة نشره على Render
+const PORT = process.env.PORT || 3000;
 
 // إعداد CORS
-const corsOptions = {
-  origin: '*', // يسمح بالوصول من أي نطاق
-  methods: ['GET', 'POST'], // تحديد طرق HTTP المسموح بها
-  allowedHeaders: ['Content-Type'], // السماح بالوصول للرؤوس المحددة
-};
-
-app.use(cors(corsOptions)); // استخدام إعدادات CORS المخصصة
+app.use(cors({ origin: '*', methods: ['GET', 'POST'], allowedHeaders: ['Content-Type'] }));
+app.use(express.json()); // التعامل مع بيانات JSON
 
 // إعداد Google Sheets API
-async function getSheetData() {
-  const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com'; // بريد حساب الخدمة
-  const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n'); // استبدال \n بالسطر الجديد
-  const spreadsheetId = '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10'; // معرف Google Sheets
-
+async function setupGoogleSheets() {
+  const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com';
+  const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n');
   const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: clientEmail,
-      private_key: privateKey,
-    },
-    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'], // إذن القراءة فقط
+    credentials: { client_email: clientEmail, private_key: privateKey },
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
-
   const client = await auth.getClient();
-  const sheets = google.sheets({ version: 'v4', auth: client });
-
-  try {
-    // قراءة البيانات من ورقة Usdt1 من A إلى E
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: 'Usdt1!A:E', // النطاق الذي سيتم قراءته
-    });
-    return response.data.values; // إرجاع القيم المقروءة
-  } catch (error) {
-    console.error('Error reading sheet:', error);
-    throw error;
-  }
+  return google.sheets({ version: 'v4', auth: client });
 }
 
-// وظيفة لتحديث البيانات في Google Sheets
-async function updateSheetData(data) {
-  const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com'; // بريد حساب الخدمة
-  const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n'); // استبدال \n بالسطر الجديد
-  const spreadsheetId = '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10'; // معرف Google Sheets
-
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: clientEmail,
-      private_key: privateKey,
-    },
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'], // إذن الكتابة
-  });
-
-  const client = await auth.getClient();
-  const sheets = google.sheets({ version: 'v4', auth: client });
-
-  try {
-    // تحديث البيانات في الصف المحدد (في المثال هذا، الصف 1)
-    const response = await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: 'Usdt1!A:E', // النطاق الذي سيتم تحديثه
-      valueInputOption: 'RAW',
-      resource: {
-        values: [
-          [data.id, data.sellAd, data.buyAd, data.withAd, data.lstUpdt], // القيم التي سيتم تحديثها
-        ],
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error updating sheet:', error);
-    throw error;
-  }
+// قراءة البيانات من Google Sheets
+async function getSheetData(spreadsheetId, range) {
+  const sheets = await setupGoogleSheets();
+  const response = await sheets.spreadsheets.values.get({ spreadsheetId, range });
+  return response.data.values || [];
 }
 
-// إعداد Express للتعامل مع الطلبات
-app.use(express.json()); // للتعامل مع البيانات التي يتم إرسالها بتنسيق JSON
+// تحديث بيانات صف معين في Google Sheets
+async function updateSheetRow(spreadsheetId, range, data) {
+  const sheets = await setupGoogleSheets();
+  const response = await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range,
+    valueInputOption: 'RAW',
+    resource: { values: [data] },
+  });
+  return response.data;
+}
 
-// نقطة النهاية لقراءة البيانات من الشيت باستخدام GET
-app.get('/row', async (req, res) => {
+// إضافة صف جديد إلى Google Sheets
+async function appendSheetRow(spreadsheetId, range, data) {
+  const sheets = await setupGoogleSheets();
+  const response = await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range,
+    valueInputOption: 'RAW',
+    resource: { values: [data] },
+  });
+  return response.data;
+}
+
+// معرف Google Sheets ونطاق العمل
+const SPREADSHEET_ID = '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10';
+const RANGE = 'Usdt1!A:E';
+
+// نقطة النهاية لقراءة البيانات
+app.get('/rows', async (req, res) => {
   try {
-    const rows = await getSheetData(); // قراءة البيانات من Google Sheets
-    if (!rows || rows.length === 0) {
-      return res.status(404).json({ message: 'No data found in the sheet' });
-    }
-    res.status(200).json({ data: rows }); // إرسال البيانات في الرد
+    const rows = await getSheetData(SPREADSHEET_ID, RANGE);
+    if (!rows.length) return res.status(404).json({ message: 'No data found in the sheet' });
+    res.status(200).json({ data: rows });
   } catch (error) {
-    console.error('Error during reading data:', error); // تسجيل التفاصيل حول الخطأ
+    console.error('Error reading data:', error);
     res.status(500).json({ error: 'Failed to read data', details: error.message });
   }
 });
 
-// نقطة النهاية لتحديث البيانات باستخدام POST
+// نقطة النهاية لتحديث صف معين
 app.post('/update', async (req, res) => {
   try {
-    const data = req.body; // البيانات المرسلة من الـ HTML عبر POST
-    console.log('Received data:', data);
-
-    if (!data.id || !data.sellAd || !data.buyAd || !data.withAd || !data.lstUpdt) {
+    const { id, sellAd, buyAd, withAd, lstUpdt } = req.body;
+    if (!id || !sellAd || !buyAd || !withAd || !lstUpdt) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const updatedData = await updateSheetData(data); // تحديث البيانات في Google Sheets
-    res.status(200).json({ message: 'Data updated successfully', data: updatedData });
+    const rows = await getSheetData(SPREADSHEET_ID, RANGE);
+    const rowIndex = rows.findIndex((row) => row[0] === id); // البحث عن الصف حسب المعرف (ID)
+    if (rowIndex === -1) {
+      return res.status(404).json({ error: 'Row not found for the given ID' });
+    }
+
+    const range = `Usdt1!A${rowIndex + 1}:E${rowIndex + 1}`; // تحديد النطاق بناءً على الصف
+    const updatedData = await updateSheetRow(SPREADSHEET_ID, range, [id, sellAd, buyAd, withAd, lstUpdt]);
+    res.status(200).json({ message: 'Row updated successfully', data: updatedData });
   } catch (error) {
-    console.error('Error during update:', error); // تسجيل التفاصيل حول الخطأ
+    console.error('Error updating data:', error);
     res.status(500).json({ error: 'Failed to update data', details: error.message });
   }
 });
 
-// تشغيل الخادم على رابط Render
+// نقطة النهاية لإضافة صف جديد
+app.post('/add', async (req, res) => {
+  try {
+    const { id, sellAd, buyAd, withAd, lstUpdt } = req.body;
+    if (!id || !sellAd || !buyAd || !withAd || !lstUpdt) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const addedData = await appendSheetRow(SPREADSHEET_ID, RANGE, [id, sellAd, buyAd, withAd, lstUpdt]);
+    res.status(200).json({ message: 'Row added successfully', data: addedData });
+  } catch (error) {
+    console.error('Error adding row:', error);
+    res.status(500).json({ error: 'Failed to add row', details: error.message });
+  }
+});
+
+// تشغيل الخادم
 app.listen(PORT, () => {
   console.log(`Server is running on https://your-app-name.onrender.com`);
 });
-// وظيفة لإضافة صف جديد في Google Sheets
-async function addSheetData(data) {
-  const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com'; // بريد حساب الخدمة
-  const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n'); // استبدال \n بالسطر الجديد
-  const spreadsheetId = '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10'; // معرف Google Sheets
-
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: clientEmail,
-      private_key: privateKey,
-    },
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'], // إذن الكتابة
-  });
-
-  const client = await auth.getClient();
-  const sheets = google.sheets({ version: 'v4', auth: client });
-
-  try {
-    // إضافة صف جديد إلى الورقة
-    const response = await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: 'Usdt1!A:E', // النطاق المستهدف للإضافة
-      valueInputOption: 'RAW',
-      resource: {
-        values: [
-          [data.id, data.sellAd, data.buyAd, data.withAd, data.lstUpdt], // القيم التي سيتم إدراجها
-        ],
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error adding new row:', error);
-    throw error;
-  }
-}
-
-  
+           

@@ -43,6 +43,14 @@
 
     <button type="submit">Update</button>
   </form>
+  <form id="addForm">
+  <input type="text" name="id" placeholder="ID" required />
+  <input type="text" name="sellAd" placeholder="Sell Ad" required />
+  <input type="text" name="buyAd" placeholder="Buy Ad" required />
+  <input type="text" name="withAd" placeholder="With Ad" required />
+  <input type="text" name="lstUpdt" placeholder="Last Updated" required />
+  <button type="submit">Add Row</button>
+  </form>
 
   <script>
     // الحصول على البيانات باستخدام GET
@@ -93,6 +101,27 @@
         alert('Error: ' + result.error);
       }
     });
+    const addForm = document.getElementById('addForm');
+  addForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(addForm);
+    const data = Object.fromEntries(formData);
+
+    try {
+      const response = await fetch('/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      console.log('Row added:', result);
+      alert(result.message);
+    } catch (error) {
+      console.error('Error adding row:', error);
+      alert('Failed to add row');
+    }
+  });
 
     // جلب البيانات عند تحميل الصفحة
     window.onload = fetchData;

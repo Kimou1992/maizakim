@@ -118,5 +118,40 @@ app.post('/update', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on https://your-app-name.onrender.com`);
 });
+// وظيفة لإضافة صف جديد في Google Sheets
+async function addSheetData(data) {
+  const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com'; // بريد حساب الخدمة
+  const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n'); // استبدال \n بالسطر الجديد
+  const spreadsheetId = '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10'; // معرف Google Sheets
+
+  const auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: clientEmail,
+      private_key: privateKey,
+    },
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'], // إذن الكتابة
+  });
+
+  const client = await auth.getClient();
+  const sheets = google.sheets({ version: 'v4', auth: client });
+
+  try {
+    // إضافة صف جديد إلى الورقة
+    const response = await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: 'Usdt1!A:E', // النطاق المستهدف للإضافة
+      valueInputOption: 'RAW',
+      resource: {
+        values: [
+          [data.id, data.sellAd, data.buyAd, data.withAd, data.lstUpdt], // القيم التي سيتم إدراجها
+        ],
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error adding new row:', error);
+    throw error;
+  }
+}
 
   

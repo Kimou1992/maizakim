@@ -1,113 +1,47 @@
-const express = require('express');
-const { google } = require('googleapis');
-const cors = require('cors');
+const express = require("express");
+const axios = require("axios");
+const crypto = require("crypto");
+const dotenv = require("dotenv");
+
+dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// إعداد CORS
-app.use(cors({ origin: '*', methods: ['GET', 'POST'], allowedHeaders: ['Content-Type'] }));
-app.use(express.json()); // التعامل مع بيانات JSON
-
-// إعداد Google Sheets API
-async function setupGoogleSheets() {
-  const clientEmail = 'tgbot-618@citric-gradient-447312-g8.iam.gserviceaccount.com';
-  const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n');
-  const auth = new google.auth.GoogleAuth({
-    credentials: { client_email: clientEmail, private_key: privateKey },
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  });
-  const client = await auth.getClient();
-  return google.sheets({ version: 'v4', auth: client });
+// دالة لإنشاء توقيع HMAC SHA256 للطلب
+function signRequest(queryString, secretKey) {
+    return crypto.createHmac("sha256", secretKey).update(queryString).digest("hex");
 }
 
-// قراءة البيانات من Google Sheets
-async function getSheetData(spreadsheetId, range) {
-  const sheets = await setupGoogleSheets();
-  const response = await sheets.spreadsheets.values.get({ spreadsheetId, range });
-  return response.data.values || [];
-}
+// إعداد JSON Parsing لتعامل مع بيانات POST
+app.use(express.json());
 
-// تحديث بيانات صف معين في Google Sheets
-async function updateSheetRow(spreadsheetId, range, data) {
-  const sheets = await setupGoogleSheets();
-  const response = await sheets.spreadsheets.values.update({
-    spreadsheetId,
-    range,
-    valueInputOption: 'RAW',
-    resource: { values: [data] },
-  });
-  return response.data;
-}
-
-// إضافة صف جديد إلى Google Sheets
-async function appendSheetRow(spreadsheetId, range, data) {
-  const sheets = await setupGoogleSheets();
-  const response = await sheets.spreadsheets.values.append({
-    spreadsheetId,
-    range,
-    valueInputOption: 'RAW',
-    resource: { values: [data] },
-  });
-  return response.data;
-}
-
-// معرف Google Sheets ونطاق العمل
-const SPREADSHEET_ID = '15qQqToX86S1hcc3lH9qqYoxb907R7nTdK697q3Fyz10';
-const RANGE = 'Usdt1!A:E';
-
-// نقطة النهاية لقراءة البيانات
-app.get('/rows', async (req, res) => {
-  try {
-    const rows = await getSheetData(SPREADSHEET_ID, RANGE);
-    if (!rows.length) return res.status(404).json({ message: 'No data found in the sheet' });
-    res.status(200).json({ data: rows });
-  } catch (error) {
-    console.error('Error reading data:', error);
-    res.status(500).json({ error: 'Failed to read data', details: error.message });
-  }
-});
-
-// نقطة النهاية لتحديث صف معين
-app.post('/update', async (req, res) => {
-  try {
-    const { id, sellAd, buyAd, withAd, lstUpdt } = req.body;
-    if (!id || !sellAd || !buyAd || !withAd || !lstUpdt) {
-      return res.status(400).json({ error: 'Missing required fields' });
+// استرجاع عنوان إيداع USDT
+app.post("/usdt-address", async (req, res) => {
+    const { apiKey, secretKey } = req.body;  // استلام API Key و Secret Key من الطلب
+    if (!apiKey || !secretKey) {
+        return res.status(400).send("يرجى إدخال API Key و Secret Key.");
     }
 
-    const rows = await getSheetData(SPREADSHEET_ID, RANGE);
-    const rowIndex = rows.findIndex((row) => row[0] === id); // البحث عن الصف حسب المعرف (ID)
-    if (rowIndex === -1) {
-      return res.status(404).json({ error: 'Row not found for the given ID' });
-    }
+    const timestamp = Date.now();
+    const coin = "USDT"; // العملة المطلوبة
+    const network = "TRX"; // شبكة TRC20، يمكن تغييرها إلى ETH أو BSC
+    const queryString = `coin=${coin}&network=${network}&timestamp=${timestamp}`;
+    const signature = signRequest(queryString, secretKey);
 
-    const range = `Usdt1!A${rowIndex + 1}:E${rowIndex + 1}`; // تحديد النطاق بناءً على الصف
-    const updatedData = await updateSheetRow(SPREADSHEET_ID, range, [id, sellAd, buyAd, withAd, lstUpdt]);
-    res.status(200).json({ message: 'Row updated successfully', data: updatedData });
-  } catch (error) {
-    console.error('Error updating data:', error);
-    res.status(500).json({ error: 'Failed to update data', details: error.message });
-  }
+    try {
+        // طلب عنوان الإيداع من Binance API باستخدام API Key و Secret Key المدخلة
+        const response = await axios.get(`https://api.binance.com/sapi/v1/capital/deposit/address?${queryString}&signature=${signature}`, {
+            headers: { "X-MBX-APIKEY": apiKey }
+        });
+
+        res.json({ address: response.data.address, network: response.data.network });
+    } catch (error) {
+        console.error("خطأ في جلب عنوان الإيداع:", error.response?.data || error.message);
+        res.status(500).send("فشل في جلب عنوان الإيداع");
+    }
 });
 
-// نقطة النهاية لإضافة صف جديد
-app.post('/add', async (req, res) => {
-  try {
-    const { id, sellAd, buyAd, withAd, lstUpdt } = req.body;
-    if (!id || !sellAd || !buyAd || !withAd || !lstUpdt) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    const addedData = await appendSheetRow(SPREADSHEET_ID, RANGE, [id, sellAd, buyAd, withAd, lstUpdt]);
-    res.status(200).json({ message: 'Row added successfully', data: addedData });
-  } catch (error) {
-    console.error('Error adding row:', error);
-    res.status(500).json({ error: 'Failed to add row', details: error.message });
-  }
-});
-
-// تشغيل الخادم
 app.listen(PORT, () => {
-  console.log(`Server is running on https://your-app-name.onrender.com`);
+    console.log(`🚀 الخادم يعمل على http://localhost:${PORT}`);
 });
-           

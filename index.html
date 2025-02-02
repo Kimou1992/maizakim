@@ -3,25 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اتصال بمحفظة أندرويد</title>
+    <title>اتصال بمحفظة MetaMask</title>
+    <script>
+        // دالة الاتصال بمحفظة MetaMask
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    // طلب حساب المستخدم من MetaMask
+                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                    // عرض عنوان المحفظة في الصفحة
+                    document.getElementById("wallet-address").innerText = "متصل بالمحفظة: " + accounts[0];
+                } catch (error) {
+                    console.error("فشل الاتصال بالمحفظة:", error);
+                    document.getElementById("wallet-address").innerText = "حدث خطأ أثناء الاتصال بالمحفظة.";
+                }
+            } else {
+                document.getElementById("wallet-address").innerText = "⚠️ لم يتم العثور على محفظة MetaMask. يرجى تثبيتها.";
+            }
+        }
+    </script>
 </head>
 <body>
-    <h1>اختر محفظتك للاتصال</h1>
-
-    <!-- زر فتح MetaMask -->
-    <button onclick="window.location.href='metamask://wallet'">افتح MetaMask</button>
-
-    <!-- زر فتح Trust Wallet -->
-    <button onclick="window.location.href='trust://browser_enable'">افتح Trust Wallet</button>
-
-    <!-- زر فتح Binance Wallet -->
-    <button onclick="window.location.href='binance://wallet'">افتح Binance Wallet</button>
-
-    <h2>إذا لم يكن لديك محفظة مثبتة، قم بتنزيلها:</h2>
-    <ul>
-        <li><a href="https://play.google.com/store/apps/details?id=io.metamask" target="_blank">تحميل MetaMask</a></li>
-        <li><a href="https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp" target="_blank">تحميل Trust Wallet</a></li>
-        <li><a href="https://play.google.com/store/apps/details?id=com.binance.dev" target="_blank">تحميل Binance Wallet</a></li>
-    </ul>
+    <h1>اتصل بمحفظتك MetaMask</h1>
+    
+    <!-- زر الاتصال بمحفظة MetaMask -->
+    <button onclick="connectWallet()">اتصل بمحفظة MetaMask</button>
+    
+    <!-- عرض عنوان المحفظة بعد الاتصال -->
+    <p id="wallet-address">لم يتم الاتصال بعد</p>
 </body>
 </html>

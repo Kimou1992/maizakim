@@ -15,7 +15,7 @@
     "@binance/w3w-rainbow-connector": "^1.0.0"
   },
   "engines": {
-    "node": "14.x"
+    "node": "16.x"
   },
   "author": "",
   "license": "ISC"

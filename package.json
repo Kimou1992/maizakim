@@ -1,19 +1,21 @@
 {
-  "name": "binance-usdt-address",
+  "name": "my-web3-app",
   "version": "1.0.0",
-  "description": "Fetch USDT deposit address from Binance using API Key and Secret Key",
+  "description": "Web3 Wallet Connection App",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "axios": "^1.3.1",
-    "crypto": "^1.0.1",
-    "dotenv": "^16.0.0",
-    "express": "^4.18.2"
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "wagmi": "^1.0.0",
+    "@rainbow-me/rainbowkit": "^0.4.0",
+    "@binance/w3w-rainbow-connector": "^1.0.0"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": "14.x"
   },
   "author": "",
   "license": "ISC"

@@ -1,31 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Binance Web3 Wallet</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض رصيد TRC20 (USDT)</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tronlink/tronlink"></script>
 </head>
 <body>
-  <h1>Binance Web3 Wallet</h1>
-  <button id="connectButton">Connect to Wallet</button>
-  <p id="walletAddress">Wallet Address: Not connected</p>
+    <h1>عرض رصيد TRC20 (USDT)</h1>
+    <button onclick="connectTronLink()">اتصل بمحفظة TRONLink</button>
+    <div id="balance"></div>
 
-  <script>
-    if (window.ethereum) {
-      const web3 = new Web3(window.ethereum);
+    <script>
+        async function connectTronLink() {
+            if (window.tronLink) {
+                try {
+                    // التأكد من جاهزية المحفظة
+                    await window.tronLink.request({ method: 'tron_requestAccounts' });
 
-      document.getElementById("connectButton").onclick = async () => {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    // الحصول على العنوان الحالي للمستخدم
+                    const address = await window.tronLink.tron.getAddress();
+                    console.log("عنوان المحفظة:", address);
 
-        const accounts = await web3.eth.getAccounts();
-        const walletAddress = accounts[0];
-        
-        document.getElementById("walletAddress").innerText = `Wallet Address: ${walletAddress}`;
-      };
-    } else {
-      alert("Please install MetaMask or Trust Wallet.");
-    }
-  </script>
+                    // استعلام رصيد TRC20 (USDT) للمستخدم
+                    getTRC20Balance(address);
+
+                } catch (error) {
+                    console.error("فشل الاتصال بـ TRONLink", error);
+                }
+            } else {
+                alert("يرجى تثبيت محفظة TRONLink أولاً.");
+            }
+        }
+
+        async function getTRC20Balance(address) {
+            // عنوان عقد USDT على شبكة TRON (TRC20)
+            const usdtContractAddress = "TXtVNeJk2hWn8HmhVm2dHfUGgqV5UjfsZD";  // عنوان عقد USDT
+
+            // استخدام مكتبة TronWeb للتفاعل مع العقود الذكية
+            const tronWeb = window.tronLink.tron;
+            
+            // الاتصال بالعقد الذكي للحصول على الرصيد
+            const contract = await tronWeb.contract().at(usdtContractAddress);
+            const balance = await contract.balanceOf(address).call();  // استعلام الرصيد
+            const balanceInUSDT = tronWeb.toBigNumber(balance).div(1000000).toString();  // تحويل من SUN إلى USDT
+
+            // عرض الرصيد على الواجهة
+            document.getElementById('balance').innerHTML = `<p>رصيد USDT في محفظة ${address}: ${balanceInUSDT} USDT</p>`;
+        }
+    </script>
 </body>
 </html>

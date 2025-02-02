@@ -7,28 +7,15 @@
     <script>
         async function connectWallet() {
             // التأكد من وجود MetaMask (window.ethereum)
-            if (window.ethereum) {
+            if (typeof window.ethereum !== 'undefined') {
                 try {
                     // طلب الحسابات من MetaMask
-                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     document.getElementById("wallet-address").innerText = "متصل بالمحفظة: " + accounts[0];
                 } catch (error) {
                     console.error("فشل الاتصال بالمحفظة:", error);
                     document.getElementById("wallet-address").innerText = "حدث خطأ أثناء الاتصال بالمحفظة.";
                 }
-            } else {
-                // إذا لم يتم العثور على MetaMask، حاول فتح التطبيق
-                openMetaMaskApp();
-            }
-        }
-
-        // فتح MetaMask عبر deeplink إذا لم يتم اكتشاف المحفظة
-        function openMetaMaskApp() {
-            let userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-            if (/android/i.test(userAgent)) {
-                // إذا كان الجهاز أندرويد، افتح MetaMask
-                window.location.href = "metamask://wallet";
             } else {
                 document.getElementById("wallet-address").innerText = "⚠️ لم يتم العثور على محفظة MetaMask. يرجى تثبيتها.";
             }

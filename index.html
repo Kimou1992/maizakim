@@ -3,67 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ربط محفظتك Web3</title>
-    <link href="https://unpkg.com/@rainbow-me/rainbowkit/dist/index.css" rel="stylesheet">
+    <title>اتصال محفظة Binance Web3</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script>
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                    document.getElementById("wallet-address").innerText = "متصل بالمحفظة: " + accounts[0];
+                } catch (error) {
+                    console.error("فشل الاتصال بالمحفظة:", error);
+                }
+            } else {
+                alert("يرجى تثبيت محفظة Web3 مثل MetaMask أو Binance Wallet.");
+            }
+        }
+    </script>
 </head>
 <body>
-    <div id="app">
-        <h1>مرحبا بك في تطبيق Web3!</h1>
-        <div id="wallet-connect">
-            <!-- سيتم عرض زر ربط المحفظة هنا -->
-        </div>
-    </div>
-    <script type="module">
-        import { ConnectButton } from 'https://cdn.skypack.dev/@rainbow-me/rainbowkit'
-        import { WagmiConfig, createConfig, configureChains, publicProvider } from 'https://cdn.skypack.dev/wagmi'
-        import binanceWallet from 'https://cdn.skypack.dev/@binance/w3w-rainbow-connector'
-        import { bsc, mainnet } from 'https://cdn.skypack.dev/wagmi/chains'
-        import { connectorsForWallets } from 'https://cdn.skypack.dev/@rainbow-me/rainbowkit'
-
-        const { chains, publicClient, webSocketPublicClient } = configureChains(
-            [bsc, mainnet],
-            [publicProvider()]
-        )
-
-        const recommendedWalletList = [
-            {
-                groupName: 'Recommended',
-                wallets: [
-                    new InjectedConnector({ chains }),
-                    binanceWallet({ chains })
-                ],
-            },
-        ]
-
-        const connectors = connectorsForWallets(recommendedWalletList)
-
-        const wagmiConfig = createConfig({
-            autoConnect: true,
-            connectors,
-            publicClient,
-            webSocketPublicClient,
-        })
-
-        const app = document.getElementById('wallet-connect')
-        const React = window.React
-        const ReactDOM = window.ReactDOM
-
-        const RainbowKitProvider = window.RainbowKitProvider
-        const WagmiConfigProvider = window.WagmiConfig
-
-        ReactDOM.render(
-            React.createElement(
-                WagmiConfigProvider, 
-                { config: wagmiConfig },
-                React.createElement(
-                    RainbowKitProvider, 
-                    { chains },
-                    React.createElement(ConnectButton)
-                )
-            ),
-            app
-        )
-    </script>
+    <h1>مرحبا بك في تطبيق Web3!</h1>
+    <button onclick="connectWallet()">اتصل بالمحفظة</button>
+    <p id="wallet-address">لم يتم الاتصال بعد</p>
 </body>
 </html>

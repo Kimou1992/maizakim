@@ -5,18 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>اتصال بمحفظة MetaMask</title>
     <script>
-        // دالة الاتصال بمحفظة MetaMask
         async function connectWallet() {
+            // التأكد من وجود MetaMask (window.ethereum)
             if (window.ethereum) {
                 try {
-                    // طلب حساب المستخدم من MetaMask
+                    // طلب الحسابات من MetaMask
                     const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-                    // عرض عنوان المحفظة في الصفحة
                     document.getElementById("wallet-address").innerText = "متصل بالمحفظة: " + accounts[0];
                 } catch (error) {
                     console.error("فشل الاتصال بالمحفظة:", error);
                     document.getElementById("wallet-address").innerText = "حدث خطأ أثناء الاتصال بالمحفظة.";
                 }
+            } else {
+                // إذا لم يتم العثور على MetaMask، حاول فتح التطبيق
+                openMetaMaskApp();
+            }
+        }
+
+        // فتح MetaMask عبر deeplink إذا لم يتم اكتشاف المحفظة
+        function openMetaMaskApp() {
+            let userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+            if (/android/i.test(userAgent)) {
+                // إذا كان الجهاز أندرويد، افتح MetaMask
+                window.location.href = "metamask://wallet";
             } else {
                 document.getElementById("wallet-address").innerText = "⚠️ لم يتم العثور على محفظة MetaMask. يرجى تثبيتها.";
             }
@@ -25,11 +37,7 @@
 </head>
 <body>
     <h1>اتصل بمحفظتك MetaMask</h1>
-    
-    <!-- زر الاتصال بمحفظة MetaMask -->
     <button onclick="connectWallet()">اتصل بمحفظة MetaMask</button>
-    
-    <!-- عرض عنوان المحفظة بعد الاتصال -->
     <p id="wallet-address">لم يتم الاتصال بعد</p>
 </body>
 </html>

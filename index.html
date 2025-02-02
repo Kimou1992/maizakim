@@ -15,13 +15,14 @@
                     console.error("فشل الاتصال بالمحفظة:", error);
                 }
             } else {
-                alert("يرجى تثبيت محفظة Web3 مثل MetaMask أو Binance Wallet.");
+                document.getElementById("wallet-address").innerHTML = 
+                    '⚠️ لم يتم العثور على محفظة Web3. يرجى تثبيت <a href="https://metamask.io/download/" target="_blank">MetaMask</a> أو <a href="https://chrome.google.com/webstore/detail/binance-wallet" target="_blank">Binance Wallet</a>.';
             }
         }
     </script>
 </head>
 <body>
-    <h1>مرحبا بك في تطبيق Web3!</h1>
+    <h1>اتصل بمحفظتك Web3</h1>
     <button onclick="connectWallet()">اتصل بالمحفظة</button>
     <p id="wallet-address">لم يتم الاتصال بعد</p>
 </body>

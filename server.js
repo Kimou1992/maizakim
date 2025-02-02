@@ -1,13 +1,17 @@
-// server.js
 const express = require('express');
 const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// توجيه الطلبات إلى المجلد الحالي
-app.use(express.static(path.join(__dirname)));
+// تقديم الملفات الثابتة
+app.use(express.static(path.join(__dirname, 'public')));
 
-// استماع للطلبات على المنفذ المحدد
+// توجيه الصفحة الرئيسية
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// تشغيل الخادم
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });

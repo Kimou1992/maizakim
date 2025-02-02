@@ -1,21 +1,14 @@
 {
-  "name": "my-web3-app",
+  "name": "binance-web3-app",
   "version": "1.0.0",
-  "description": "Web3 Wallet Connection App",
+  "description": "Binance Web3 Wallet Example",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.17.1"
-  },
-  "devDependencies": {
-    "wagmi": "^1.0.0",
-    "@rainbow-me/rainbowkit": "^0.4.0",
-    "@binance/w3w-rainbow-connector": "^1.0.0"
-  },
-  "engines": {
-    "node": "16.x"
+    "express": "^4.17.1",
+    "web3": "^1.6.1"
   },
   "author": "",
   "license": "ISC"

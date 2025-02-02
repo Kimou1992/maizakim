@@ -1,29 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اتصال محفظة Binance Web3</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
-    <script>
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-                    document.getElementById("wallet-address").innerText = "متصل بالمحفظة: " + accounts[0];
-                } catch (error) {
-                    console.error("فشل الاتصال بالمحفظة:", error);
-                }
-            } else {
-                document.getElementById("wallet-address").innerHTML = 
-                    '⚠️ لم يتم العثور على محفظة Web3. يرجى تثبيت <a href="https://metamask.io/download/" target="_blank">MetaMask</a> أو <a href="https://chrome.google.com/webstore/detail/binance-wallet" target="_blank">Binance Wallet</a>.';
-            }
-        }
-    </script>
+    <title>اتصال بمحفظة أندرويد</title>
 </head>
 <body>
-    <h1>اتصل بمحفظتك Web3</h1>
-    <button onclick="connectWallet()">اتصل بالمحفظة</button>
-    <p id="wallet-address">لم يتم الاتصال بعد</p>
+    <h1>اختر محفظتك للاتصال</h1>
+
+    <!-- زر فتح MetaMask -->
+    <button onclick="window.location.href='metamask://wallet'">افتح MetaMask</button>
+
+    <!-- زر فتح Trust Wallet -->
+    <button onclick="window.location.href='trust://browser_enable'">افتح Trust Wallet</button>
+
+    <!-- زر فتح Binance Wallet -->
+    <button onclick="window.location.href='binance://wallet'">افتح Binance Wallet</button>
+
+    <h2>إذا لم يكن لديك محفظة مثبتة، قم بتنزيلها:</h2>
+    <ul>
+        <li><a href="https://play.google.com/store/apps/details?id=io.metamask" target="_blank">تحميل MetaMask</a></li>
+        <li><a href="https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp" target="_blank">تحميل Trust Wallet</a></li>
+        <li><a href="https://play.google.com/store/apps/details?id=com.binance.dev" target="_blank">تحميل Binance Wallet</a></li>
+    </ul>
 </body>
 </html>

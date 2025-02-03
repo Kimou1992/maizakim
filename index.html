@@ -25,8 +25,8 @@
 
     <script type="text/javascript">
         function onTelegramAuth(user) {
-            alert('تم تسجيل الدخول كـ ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
-            document.getElementById("telegramAddress").innerHTML = `تم تسجيل الدخول إلى تلجرام: <a href="https://t.me/${user.username}" class="telegram-link" target="_blank">@${user.username}</a>`;
+            alert('تم تسجيل الدخول كـ ' + user.first_name + ' ' + user.last_name + ' (' + user.id + ')');
+            document.getElementById("telegramAddress").innerHTML = `تم تسجيل الدخول إلى تلجرام: ID - ${user.id}`;
         }
 
         const telegramUsername = "Tonhakimbot"; // اسم البوت الخاص بك

@@ -8,14 +8,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(cors());
+app.use(cors()); // السماح بالطلبات من أي مصدر
 
 // دالة لتوقيع الطلبات إلى Binance API
 function signRequest(queryString, secretKey) {
     return crypto.createHmac("sha256", secretKey).update(queryString).digest("hex");
 }
 
-// نقطة API لاسترجاع عنوان USDT
+// نقطة API لاسترجاع عنوان USDT (باستخدام POST فقط)
 app.post("/get-usdt-address", async (req, res) => {
     try {
         const { apiKey, secretKey } = req.body;

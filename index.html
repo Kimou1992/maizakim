@@ -17,6 +17,8 @@
     <button id="connectWallet">اتصل بالمحفظة</button>
     <p id="walletAddress">لم يتم الاتصال بعد</p>
     <p id="telegramAddress"></p>
+    <!-- عرض الـ ID في نص منفصل -->
+    <p id="telegramID">ID المستخدم سيظهر هنا</p>
 
     <!-- إضافة زر تسجيل الدخول عبر تلجرام -->
     <div id="telegramButton"></div>
@@ -26,7 +28,8 @@
     <script type="text/javascript">
         function onTelegramAuth(user) {
             alert('تم تسجيل الدخول كـ ' + user.first_name + ' ' + user.last_name + ' (' + user.id + ')');
-            // تأكد من ظهور الـ ID بشكل دائم
+            // عرض الـ ID في النص الجديد
+            document.getElementById("telegramID").innerHTML = `ID المستخدم: ${user.id}`;
             document.getElementById("telegramAddress").innerHTML = `تم تسجيل الدخول إلى تلجرام: ID - ${user.id}`;
         }
 

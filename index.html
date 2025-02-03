@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الاتصال بمحفظة MetaMask</title>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <title>الاتصال بمحفظة TronLink</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 50px; direction: rtl; }
         button { padding: 10px 20px; font-size: 18px; cursor: pointer; margin-top: 20px; }
@@ -13,35 +12,25 @@
 </head>
 <body>
 
-    <h2>الاتصال بمحفظة MetaMask</h2>
+    <h2>الاتصال بمحفظة TronLink</h2>
     <button id="connectWallet">اتصل بالمحفظة</button>
     <p id="walletAddress">لم يتم الاتصال بعد</p>
 
     <script>
         async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await window.ethereum.request({ method: "eth_requestAccounts" });
-                    const signer = provider.getSigner();
-                    const address = await signer.getAddress();
-                    document.getElementById("walletAddress").innerText = `عنوان المحفظة: ${address}`;
-                } catch (error) {
-                    console.error("خطأ في الاتصال بالمحفظة:", error);
-                    alert("فشل الاتصال بالمحفظة. تأكد من السماح بالاتصال في MetaMask.");
-                }
+            if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+                const address = window.tronWeb.defaultAddress.base58;
+                document.getElementById("walletAddress").innerText = `عنوان المحفظة: ${address}`;
             } else {
-                alert("يرجى تثبيت MetaMask لاستخدام هذه الميزة!");
+                alert("يرجى تثبيت TronLink والاتصال بالمحفظة!");
             }
         }
 
         document.getElementById("connectWallet").addEventListener("click", connectWallet);
 
-        // الاتصال التلقائي عند تحميل الصفحة داخل متصفح MetaMask
+        // الاتصال التلقائي عند تحميل الصفحة داخل متصفح TronLink
         window.addEventListener("load", async () => {
-            if (window.ethereum) {
-                await connectWallet();
-            }
+            setTimeout(connectWallet, 1000); // تأخير بسيط للتأكد من تحميل TronLink
         });
     </script>
 

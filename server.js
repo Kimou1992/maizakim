@@ -1,17 +1,44 @@
-const express = require('express');
-const path = require('path');
+require("dotenv").config();
+const express = require("express");
+const axios = require("axios");
+const crypto = require("crypto");
+const cors = require("cors");
+
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-// تقديم الملفات الثابتة من المجلد الحالي
-app.use(express.static(__dirname));
+app.use(express.json());
+app.use(cors());
 
-// توجيه الصفحة الرئيسية
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+// دالة لتوقيع الطلبات إلى Binance API
+function signRequest(queryString, secretKey) {
+    return crypto.createHmac("sha256", secretKey).update(queryString).digest("hex");
+}
+
+// نقطة API لاسترجاع عنوان USDT
+app.post("/get-usdt-address", async (req, res) => {
+    try {
+        const { apiKey, secretKey } = req.body;
+
+        if (!apiKey || !secretKey) {
+            return res.status(400).json({ error: "يرجى إدخال API Key و Secret Key" });
+        }
+
+        const timestamp = Date.now();
+        const params = `coin=USDT&timestamp=${timestamp}`;
+        const signature = signRequest(params, secretKey);
+
+        const response = await axios.get(`https://api.binance.com/sapi/v1/capital/deposit/address?${params}&signature=${signature}`, {
+            headers: { "X-MBX-APIKEY": apiKey },
+        });
+
+        res.json({ address: response.data.address });
+    } catch (error) {
+        console.error("حدث خطأ:", error.response?.data || error.message);
+        res.status(500).json({ error: "فشل جلب عنوان USDT" });
+    }
 });
 
-// تشغيل الخادم
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+app.listen(PORT, () => {
+    console.log(`🚀 الخادم يعمل على المنفذ ${PORT}`);
 });

@@ -26,6 +26,7 @@
     <script type="text/javascript">
         function onTelegramAuth(user) {
             alert('تم تسجيل الدخول كـ ' + user.first_name + ' ' + user.last_name + ' (' + user.id + ')');
+            // تأكد من ظهور الـ ID بشكل دائم
             document.getElementById("telegramAddress").innerHTML = `تم تسجيل الدخول إلى تلجرام: ID - ${user.id}`;
         }
 

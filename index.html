@@ -8,6 +8,7 @@
         body { font-family: Arial, sans-serif; text-align: center; margin: 50px; direction: rtl; }
         button { padding: 10px 20px; font-size: 18px; cursor: pointer; margin-top: 20px; }
         p { font-size: 18px; margin-top: 20px; }
+        .telegram-link { color: #0088cc; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -15,12 +16,16 @@
     <h2>الاتصال بمحفظة TronLink</h2>
     <button id="connectWallet">اتصل بالمحفظة</button>
     <p id="walletAddress">لم يتم الاتصال بعد</p>
+    <p id="telegramAddress"></p>
 
     <script>
+        const telegramUsername = "your_telegram_username"; // ضع اسم المستخدم الخاص بتلجرام هنا
+
         async function connectWallet() {
             if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
                 const address = window.tronWeb.defaultAddress.base58;
                 document.getElementById("walletAddress").innerText = `عنوان المحفظة: ${address}`;
+                document.getElementById("telegramAddress").innerHTML = `للتواصل على التلجرام: <a href="https://t.me/${telegramUsername}" class="telegram-link" target="_blank">@${telegramUsername}</a>`;
             } else {
                 alert("يرجى تثبيت TronLink والاتصال بالمحفظة!");
             }

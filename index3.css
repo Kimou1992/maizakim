@@ -1,0 +1,63 @@
+/* تصميم المستطيلات */
+.rectangle {
+    width: 100%;
+    height: 50px;
+    border: 0px solid #000;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* لكلمة مع الأيقونة */
+.text-with-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.text-with-icon img {
+    width: 20px;
+    height: auto;
+}
+
+.text-with-icon span {
+    font-size: 16px;
+    font-weight: bold;
+    background-image: linear-gradient(to right, #0ed2b3 10%, #f3456c 90%);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+/* خط رفيع تحت المستطيل الثاني */
+.line {
+    width: 100%;
+    height: 1px;
+    background-color: #d3d3d3;
+    margin-top: 3px;
+}
+.clickable-text1 {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+      background-color: #69b3e7;
+      color: #fff;
+      border-radius: 8px;
+      margin : 8px;
+    }
+.telegram-link { color: #0088cc; text-decoration: none; font-weight: bold; }
+.wdrs {
+      margin : 8px;
+      font-size: 14px;
+      color: #726969ff;
+}
+.wadress {
+      border: 1px solid gray;
+      border-radius: 8px;
+      margin-top: 8px;
+}

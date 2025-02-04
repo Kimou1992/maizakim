@@ -61,3 +61,6 @@
       border-radius: 8px;
       margin-top: 8px;
 }
+#telegramButton {
+    margin-left: 8px; /* تعديل المسافة حسب الحاجة */
+}

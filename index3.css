@@ -1,11 +1,3 @@
-body {
-    display: flex;
-    justify-content: center; /* توسيط أفقي */
-    align-items: center; /* توسيط عمودي */
-    height: 100vh; /* جعل الصفحة تأخذ كامل ارتفاع الشاشة */
-    margin: 0; /* إزالة الهوامش الافتراضية */
-}
-
 /* تصميم المستطيلات */
 .rectangle {
     width: 100%;

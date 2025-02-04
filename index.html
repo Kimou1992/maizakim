@@ -32,10 +32,8 @@
 
     <script type="text/javascript">
         function onTelegramAuth(user) {
-            alert('تم تسجيل الدخول كـ ' + user.first_name + ' ' + user.last_name + ' (' + user.id + ')');
-            // عرض الـ ID في النص الجديد
-            document.getElementById("telegramID").innerHTML = `ID المستخدم: ${user.id}`;
-            document.getElementById("telegramAddress").innerHTML = `تم تسجيل الدخول إلى تلجرام: ID - ${user.id}`;
+            document.getElementById("telegramID").innerHTML = `telegram ID: ${user.id}`;
+            document.getElementById("telegramAddress").innerHTML = `telegram ID: ${user.id}`;
         }
 
         const telegramUsername = "Tonhakimbot"; // اسم البوت الخاص بك

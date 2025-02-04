@@ -3,29 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تجربة تسجيل الدخول عبر Telegram</title>
+    <title>الاتصال بمحفظة TronLink مع تلجرام</title>
+    <link rel="stylesheet" href="index3.css">
+   
 </head>
-<body style="text-align: center; font-family: Arial, sans-serif; margin-top: 50px;">
-
-    <h2>اختبار زر تسجيل الدخول عبر Telegram</h2>
+<body>
+    <!-- المستطيل الأول -->
+    <div class="rectangle">
+        <div class="text-with-icon">
+            <img src="https://i.ibb.co/crhnJYW/IMG-20241213-051319.png" alt="icon-left">
+            <span>USDT Exchange (DZ)</span>
+        </div>
+    </div>
+    <div class="line"></div>
+    <div class="wadress">
+       <div class="clickable-text1" id="connectWallet">connectWallet</div>
+       <div class="wdrs" id="walletAddress">not connected yet</div>
+    </div>
     
-    <!-- زر تسجيل الدخول سيظهر هنا -->
+    <p id="telegramAddress"></p>
+    <!-- عرض الـ ID في نص منفصل -->
+    <p id="telegramID">your telegram ID</p>
+
+    <!-- إضافة زر تسجيل الدخول عبر تلجرام -->
     <div id="telegramButton"></div>
 
-    <!-- سكريبت تسجيل الدخول -->
-    <script async src="https://telegram.org/js/telegram-widget.js?22"
-        data-telegram-login="Tonhakimbot"
-        data-size="large"
-        data-userpic="false"
-        data-onauth="onTelegramAuth(user)"
-        data-request-access="write">
-    </script>
+    <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="Tonhakimbot" data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
 
     <script type="text/javascript">
         function onTelegramAuth(user) {
-            alert('تم تسجيل الدخول كـ ' + user.first_name + ' ' + user.last_name + 
-                  ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
+            alert('تم تسجيل الدخول كـ ' + user.first_name + ' ' + user.last_name + ' (' + user.id + ')');
+            // عرض الـ ID في النص الجديد
+            document.getElementById("telegramID").innerHTML = `ID المستخدم: ${user.id}`;
+            document.getElementById("telegramAddress").innerHTML = `تم تسجيل الدخول إلى تلجرام: ID - ${user.id}`;
         }
+
+        const telegramUsername = "Tonhakimbot"; // اسم البوت الخاص بك
+
+        async function connectWallet() {
+            if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+                const address = window.tronWeb.defaultAddress.base58;
+                document.getElementById("walletAddress").innerText = `عنوان المحفظة: ${address}`;
+                document.getElementById("telegramAddress").innerHTML = `للتواصل على التلجرام: <a href="https://t.me/${telegramUsername}" class="telegram-link" target="_blank">@${telegramUsername}</a>`;
+            } else {
+                alert("يرجى تثبيت TronLink والاتصال بالمحفظة!");
+            }
+        }
+
+        document.getElementById("connectWallet").addEventListener("click", connectWallet);
+
+        // الاتصال التلقائي عند تحميل الصفحة داخل متصفح TronLink
+        window.addEventListener("load", async () => {
+            setTimeout(connectWallet, 1000); // تأخير بسيط للتأكد من تحميل TronLink
+        });
     </script>
 
 </body>

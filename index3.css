@@ -61,8 +61,4 @@
       border-radius: 8px;
       margin-top: 8px;
 }
-#telegramButton {
-    display: block; /* تأكد من أنه يظهر كعنصر مستقل */
-    margin-left: 12px; /* زيادة المسافة حسب الحاجة */
-    padding: 8px 0; /* تحسين التباعد العمودي */
-}
+

@@ -1,59 +1,51 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الاتصال بمحفظة TronLink مع تلجرام</title>
-    <link rel="stylesheet" href="index3.css">
-   
+    <title>Telegram Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .box {
+            background: #0088cc;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+    </style>
 </head>
 <body>
-    <!-- المستطيل الأول -->
-    <div class="rectangle">
-        <div class="text-with-icon">
-            <img src="https://i.ibb.co/crhnJYW/IMG-20241213-051319.png" alt="icon-left">
-            <span>USDT Exchange (DZ)</span>
+
+    <h2>Welcome to Telegram Mini App</h2>
+    <div class="container">
+        <div class="box">
+            <p><strong>User ID:</strong> <span id="userId">Loading...</span></p>
+            <p><strong>First Name:</strong> <span id="firstName">Loading...</span></p>
         </div>
     </div>
-    <div class="line"></div>
-    <div class="wadress">
-       <div class="clickable-text1" id="connectWallet">wallet connect</div>
-       <div class="wdrs" id="walletAddress">not connected yet</div>
-    </div>
-    <div class="wadress">
-    <p class="wdrs" id="telegramAddress"></p>
 
-    <!-- إضافة زر تسجيل الدخول عبر تلجرام -->
-    <div id="telegramButton"></div>
-    <p class="wdrs" id="telegramID">telegram not signed up yet</p>
-    <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="Tonhakimbot" data-size="large" data-radius="8" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // توسيع التطبيق المصغر لملء الشاشة
 
-    <script type="text/javascript">
-        function onTelegramAuth(user) {
-            document.getElementById("telegramID").innerHTML = `telegram ID: ${user.id}`;
-            document.getElementById("telegramAddress").innerHTML = `telegram ID: ${user.id}`;
+        // استخراج بيانات المستخدم
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById("userId").innerText = tg.initDataUnsafe.user.id;
+            document.getElementById("firstName").innerText = tg.initDataUnsafe.user.first_name;
+        } else {
+            document.getElementById("userId").innerText = "Not available";
+            document.getElementById("firstName").innerText = "Not available";
         }
-
-        const telegramUsername = "Tonhakimbot"; // اسم البوت الخاص بك
-
-        async function connectWallet() {
-            if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-                const address = window.tronWeb.defaultAddress.base58;
-                document.getElementById("walletAddress").innerText = `your adress: ${address}`;
-                document.getElementById("telegramAddress").innerHTML = `telegram bot: <a href="https://t.me/${telegramUsername}" class="telegram-link" target="_blank">@${telegramUsername}</a>`;
-                
-            } else {
-                alert("يرجى تثبيت TronLink والاتصال بالمحفظة!");
-            }
-        }
-
-        document.getElementById("connectWallet").addEventListener("click", connectWallet);
-
-        // الاتصال التلقائي عند تحميل الصفحة داخل متصفح TronLink
-        window.addEventListener("load", async () => {
-            setTimeout(connectWallet, 1000); // تأخير بسيط للتأكد من تحميل TronLink
-        });
     </script>
-    </div>
+
 </body>
 </html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram WebApp</title>
+</head>
+<body>
+
+    <h2>بيانات المستخدم</h2>
+    <p>المعرف (ID): <span id="storedTextDisplay">جارٍ التحميل...</span></p>
+    <p>الاسم الأول: <span id="storedTextDisplay2">جارٍ التحميل...</span></p>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // توسيع التطبيق المصغر لملء الشاشة
+
+        // التحقق من البيانات المخزنة
+        let storedText = localStorage.getItem("storedText");
+        let storedText2 = localStorage.getItem("storedText2");
+
+        if (!storedText || !storedText2) {
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                let userId = tg.initDataUnsafe.user.id;
+                let firstName = tg.initDataUnsafe.user.first_name;
+
+                // تخزين البيانات في localStorage
+                localStorage.setItem("storedText", userId);
+                localStorage.setItem("storedText2", firstName);
+
+                // تحديث العرض
+                document.getElementById("storedTextDisplay").textContent = userId;
+                document.getElementById("storedTextDisplay2").textContent = firstName;
+            } else {
+                document.getElementById("storedTextDisplay").textContent = "غير متاح";
+                document.getElementById("storedTextDisplay2").textContent = "غير متاح";
+            }
+        } else {
+            // عرض القيم المخزنة مسبقًا
+            document.getElementById("storedTextDisplay").textContent = storedText;
+            document.getElementById("storedTextDisplay2").textContent = storedText2;
+        }
+    </script>
+
+</body>
+</html>
